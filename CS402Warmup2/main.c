@@ -159,6 +159,10 @@ int main(int argc, const char * argv[]) {
                 exit(0);
             }
         }
+        else {
+            fprintf(stderr,"Malformed Command , Filename not in proper format ");
+            exit(0); 
+        }
     }
     
     pthread_t packetThread,tokenThread,serverThread1,serverThread2;
