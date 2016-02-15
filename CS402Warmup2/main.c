@@ -15,8 +15,13 @@
 #include <sys/types.h>
 #include <math.h>
 #include "string.h"
+#include <signal.h>
+
 
 // check if token bucket can be stack
+sigset_t quitSignal;
+struct sigaction action;
+
 My402List Q1,Q2,tokenBucket;
 pthread_mutex_t Q1Mutex;
 pthread_cond_t serverQ;
@@ -24,7 +29,7 @@ unsigned int packetCount = 0;
 unsigned int packetsServed = 0;
 double lambda = 1,mu = 0.35,r = 1.5, b = 10 ,p = 3,num = 20;
 char *fileName;
-pthread_t packetThread,tokenThread,serverThread1,serverThread2;
+pthread_t packetThread,tokenThread,serverThread1,serverThread2,signalQuitThread;
 
 typedef struct packet
 {
@@ -38,6 +43,9 @@ void *packetArrivalMethod(void *args);
 void *tokenArrivalMethod(void *args);
 void *serverMethod(void *args);
 void *server2Method(void *args);
+void *handleQuitGracefully(void *args);
+void handleQuit(int signal);
+
 
 int main(int argc, const char * argv[]) {
     
@@ -166,10 +174,16 @@ int main(int argc, const char * argv[]) {
         }
     }
     
+    sigemptyset(&quitSignal);
+    sigaddset(&quitSignal, SIGINT);
+    pthread_sigmask(SIG_BLOCK, &quitSignal, NULL);
+
     pthread_create(&packetThread, NULL,packetArrivalMethod,NULL);
     pthread_create(&tokenThread, NULL,tokenArrivalMethod, NULL);
     pthread_create(&serverThread1, NULL,serverMethod, NULL);
     pthread_create(&serverThread2, NULL,server2Method, NULL);
+    pthread_create(&signalQuitThread, NULL,handleQuitGracefully, NULL);
+
     
     pthread_join(packetThread, NULL);
     pthread_join(tokenThread, NULL);
@@ -207,6 +221,7 @@ void *packetArrivalMethod(void *args)
         {
             
             if (newPacket->tokensNeeded > b) {
+                packetsServed++;
                 gettimeofday(&time,NULL);
                 elapsedTime = time.tv_sec + time.tv_usec*1000000L - currentTime;
                 pthread_mutex_unlock(&Q1Mutex);
@@ -217,7 +232,9 @@ void *packetArrivalMethod(void *args)
             gettimeofday(&newPacket->Q1EnterTime, NULL);
             printf("\n packet%d enters Q1",newPacket->ID);
             
+            pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
             My402ListAppend(&Q1,(void*)newPacket);
+            pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
             
             packet *dequePacket = (packet*)My402ListFirst(&Q1)->obj;
 
@@ -236,12 +253,17 @@ void *packetArrivalMethod(void *args)
                 gettimeofday(&temp, NULL);
                 printf("\n p%d leaves Q1, time in Q1 = %ld, token bucket now has %d token",dequePacket->ID,(temp.tv_sec + temp.tv_usec*1000000L) - (dequePacket->Q1EnterTime.tv_sec + dequePacket->Q1EnterTime.tv_usec*1000000L),Q1.num_members);
                 
+                pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
                 My402ListUnlink(&Q1, My402ListFirst(&Q1));
-                
+                pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
+
                 gettimeofday(&newPacket->Q2EnterTime, NULL);
                 printf("\n packet%d enters Q2",newPacket->ID);
                 
+                pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
                 My402ListAppend(&Q2,(packet*)dequePacket);
+                pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
+
 
             }
         }
@@ -302,23 +324,29 @@ void *tokenArrivalMethod(void *args)
                     gettimeofday(&temp, NULL);
                     
                     printf("\n p%d leaves Q1, time in Q1 = %ld, token bucket now has %d token",dequePacket->ID,(temp.tv_sec + temp.tv_usec*1000000L) - (dequePacket->Q1EnterTime.tv_sec + dequePacket->Q1EnterTime.tv_usec*1000000L),Q1.num_members);
-                    
+                
+                    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
                     My402ListUnlink(&Q1, My402ListFirst(&Q1));
+                    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
 
                     printf("packet%d enters Q2\n",dequePacket->ID);
                 
+                    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
                     My402ListAppend(&Q2,(packet*)dequePacket);
+                    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
+
                 }
-                
+            
                 if (!My402ListEmpty(&Q2)) {
                     pthread_cond_broadcast(&serverQ);
                 }
             
+            pthread_mutex_unlock(&Q1Mutex);
+            
             if (packetsServed == num) {
                 break;
             }
-            
-            pthread_mutex_unlock(&Q1Mutex);
+
         }
         
         gettimeofday(&time,NULL);
@@ -337,10 +365,15 @@ void *serverMethod(void *args)
         pthread_mutex_lock(&Q1Mutex);
         
 
-        while (My402ListEmpty(&Q2)) {
+        while (My402ListEmpty(&Q2) && packetsServed != num) {
             pthread_cond_wait(&serverQ, &Q1Mutex);
         }
         
+        if (packetsServed == num) {
+            pthread_mutex_unlock(&Q1Mutex);
+            break;
+        }
+
         packet *dequePacket = (packet*)My402ListFirst(&Q2)->obj;
         struct timeval temp;
         gettimeofday(&temp, NULL);
@@ -365,10 +398,7 @@ void *serverMethod(void *args)
 
         printf("\n p% departs from S1, service time = %lldms , time in system = %ldms",dequePacket->ID,(currentTime - (dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000)),(dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000000L) - (dequePacket->serviceEndTime.tv_sec + dequePacket->serviceEndTime.tv_usec*1000000L));
         
-        if (++packetsServed == num) {
-            printf("\n Emulation ends");
-            pthread_cancel(serverThread2);
-            pthread_cancel(tokenThread);
+        if (packetsServed == num) {
             break;
         }
        
@@ -384,10 +414,15 @@ void *server2Method(void *args)
         
         pthread_mutex_lock(&Q1Mutex);
         
-        while (My402ListEmpty(&Q2)) {
+        while (My402ListEmpty(&Q2) && packetsServed != num) {
             pthread_cond_wait(&serverQ, &Q1Mutex);
         }
         
+        if (packetsServed == num) {
+            pthread_mutex_unlock(&Q1Mutex);
+            break;
+        }
+
         packet *dequePacket = (packet*)My402ListFirst(&Q2)->obj;
         struct timeval temp;
         gettimeofday(&temp, NULL);
@@ -413,9 +448,6 @@ void *server2Method(void *args)
            printf("\n p% departs from S2, service time = %lldms , time in system = %ldms",dequePacket->ID,(currentTime - (dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000)),(dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000000L) - (dequePacket->serviceEndTime.tv_sec + dequePacket->serviceEndTime.tv_usec*1000000L));
 
         if (packetsServed == num) {
-            printf("\n Emulation ends");
-            pthread_cancel(serverThread1);
-            pthread_cancel(tokenThread);
             break;
         }
         
@@ -423,4 +455,30 @@ void *server2Method(void *args)
     return(0);
 }
 
+void *handleQuitGracefully(void *args)
+{
+    while (1) {
+        pthread_sigmask(SIG_UNBLOCK, &quitSignal, NULL);
+        action.sa_handler = handleQuit;
+        sigaction(SIGINT, &action, NULL);
+        usleep(3000000);
+    }
+}
+
+void handleQuit(int signal)
+{
+    pthread_cancel(tokenThread);
+    pthread_cancel(packetThread);
+    
+    // add a bool to condition and broadcast condition
+    
+    pthread_mutex_lock(&Q1Mutex);
+    
+    // traverse Q1 and Q2 to prompt delete
+    My402ListUnlinkAll(&Q1);
+    My402ListUnlinkAll(&Q2);
+    
+    pthread_mutex_unlock(&Q1Mutex);
+    pthread_exit(0);
+}
 
