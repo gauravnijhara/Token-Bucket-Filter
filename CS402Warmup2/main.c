@@ -464,13 +464,20 @@ void *serverMethod(void *args)
 
         printf("\n p%d begins service at S1, requesting %dms of service",dequePacket->ID,100);
      
+	printf("\n my sleep time is %lf",dequePacket->serviceTime);
+
         usleep((unsigned int)fabs((dequePacket->serviceTime)*1000000L - elapsedTime/1000000L));
+
+
 
         gettimeofday(&dequePacket->serviceEndTime,NULL);
         currentTime = dequePacket->serviceEndTime.tv_sec + dequePacket->serviceEndTime.tv_usec*1000000L;
 
+	printf("\n my sleep time 2 is %d",packetsServed);
+
         printf("\n p% departs from S1, service time = %lldms , time in system = %ldms",dequePacket->ID,(currentTime - (dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000)),(dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000000L) - (dequePacket->serviceEndTime.tv_sec + dequePacket->serviceEndTime.tv_usec*1000000L));
         
+
         if (packetsServed == num || serveInterrupt) {
             if (packetsServed == num) {
                 pthread_mutex_lock(&Q1Mutex);
@@ -519,12 +526,21 @@ void *server2Method(void *args)
         
         printf("\n p%d begins service at S2, requesting %dms of service",dequePacket->ID,100);
         
-        usleep((unsigned int)fabs((dequePacket->serviceTime)*1000000L - elapsedTime/1000000L));
+	printf("\n my sleep time is %lf",dequePacket->serviceTime);
         
+	usleep((unsigned int)fabs((dequePacket->serviceTime)*1000000L - elapsedTime/1000000L));
+        
+
+
         gettimeofday(&dequePacket->serviceEndTime,NULL);
         currentTime = dequePacket->serviceEndTime.tv_sec + dequePacket->serviceEndTime.tv_usec*1000000L;
         
-           printf("\n p% departs from S2, service time = %lldms , time in system = %ldms",dequePacket->ID,(currentTime - (dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000)),(dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000000L) - (dequePacket->serviceEndTime.tv_sec + dequePacket->serviceEndTime.tv_usec*1000000L));
+
+	printf("\n my sleep time 2 is %d",packetsServed);
+
+        printf("\n p% departs from S2, service time = %lldms , time in system = %ldms",dequePacket->ID,(currentTime - (dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000)),(dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000000L) - (dequePacket->serviceEndTime.tv_sec + dequePacket->serviceEndTime.tv_usec*1000000L));
+
+
 
         if (packetsServed == num || serveInterrupt) {
             if (packetsServed == num) {
