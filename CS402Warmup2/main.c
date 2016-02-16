@@ -168,7 +168,8 @@ int main(int argc, const char * argv[]) {
                                     int tokenCount = atoi(buffer);
                                     packetList = (packet**)malloc(sizeof(tokenCount));
                                     
-                                    for (int i = 0; i < tokenCount; i++) {
+                                    int i;
+                                    for (i = 0; i < tokenCount; i++) {
                                         packet *newPacket = (packet*)malloc(sizeof(packet));
                                         newPacket->ID = i+1;
                                         packetList[i] = newPacket;
@@ -236,7 +237,8 @@ int main(int argc, const char * argv[]) {
     
     if (!isTraceFileMode) {
         packetList = (packet**)malloc(sizeof(num));
-        for (int i = 0; i < num; i++) {
+        int i;
+        for (i = 0; i < num; i++) {
             packet *newPacket = (packet*)malloc(sizeof(packet));
             newPacket->ID = i+1;
             newPacket->interArrivalTime = (1/lambda);
