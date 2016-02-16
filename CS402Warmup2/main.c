@@ -473,7 +473,9 @@ void *serverMethod(void *args)
         
         if (packetsServed == num || serveInterrupt) {
             if (packetsServed == num) {
+                pthread_mutex_lock(&Q1Mutex);
                 pthread_cond_broadcast(&serverQ);
+                pthread_mutex_unlock(&Q1Mutex);
             }
                 printf("Emulation ends");
             break;
@@ -526,7 +528,9 @@ void *server2Method(void *args)
 
         if (packetsServed == num || serveInterrupt) {
             if (packetsServed == num) {
+                pthread_mutex_lock(&Q1Mutex);
                 pthread_cond_broadcast(&serverQ);
+                pthread_mutex_unlock(&Q1Mutex);
             }
             printf("Emulation ends");
             break;
