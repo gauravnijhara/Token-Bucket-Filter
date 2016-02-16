@@ -292,14 +292,14 @@ void *packetArrivalMethod(void *args)
 
         newPacket->systemTimeOnEnter = time;
         
-        pthread_mutex_lock(&Q1Mutex);
+        pthread_mutex_lock(&Q1Mutex); printf("\n ------ mutex lock taken ----- \n");
         {
             
             if (newPacket->tokensNeeded > b) {
                 packetsServed++;
                 gettimeofday(&time,NULL);
                 elapsedTime = time.tv_sec + time.tv_usec*1000000L - currentTime;
-                pthread_mutex_unlock(&Q1Mutex);
+                pthread_mutex_unlock(&Q1Mutex); printf("\n +++++++ mutex unlock  +++++++ \n");
                 continue;
             }
             
@@ -347,7 +347,7 @@ void *packetArrivalMethod(void *args)
             pthread_cond_broadcast(&serverQ);
         }
 
-        pthread_mutex_unlock(&Q1Mutex);
+        pthread_mutex_unlock(&Q1Mutex); printf("\n +++++++ mutex unlock  +++++++ \n");
         
         
         gettimeofday(&time,NULL);
@@ -372,7 +372,7 @@ void *tokenArrivalMethod(void *args)
         gettimeofday(&time,NULL);
         currentTime = time.tv_sec + time.tv_usec*1000000L;
 
-        pthread_mutex_lock(&Q1Mutex);
+        pthread_mutex_lock(&Q1Mutex); printf("\n ------ mutex lock taken ----- \n");
         {
 
             if (tokenBucket.num_members <= 100) {
@@ -381,7 +381,7 @@ void *tokenArrivalMethod(void *args)
             }
             
             if (Q1.num_members <= 0) {
-                pthread_mutex_unlock(&Q1Mutex);
+                pthread_mutex_unlock(&Q1Mutex); printf("\n +++++++ mutex unlock  +++++++ \n");
                 continue;
             }
             
@@ -417,7 +417,7 @@ void *tokenArrivalMethod(void *args)
                     pthread_cond_broadcast(&serverQ);
                 }
             
-            pthread_mutex_unlock(&Q1Mutex);
+            pthread_mutex_unlock(&Q1Mutex); printf("\n +++++++ mutex unlock  +++++++ \n");
             
             if (packetsServed == num) {
                 break;
@@ -439,7 +439,7 @@ void *serverMethod(void *args)
 
     while (1) {
         
-        pthread_mutex_lock(&Q1Mutex);
+        pthread_mutex_lock(&Q1Mutex); printf("\n ------ mutex lock taken ----- \n");
         
 
         while (My402ListEmpty(&Q2) && packetsServed != num && !serveInterrupt) {
@@ -447,7 +447,7 @@ void *serverMethod(void *args)
         }
         
         if (packetsServed == num || serveInterrupt) {
-            pthread_mutex_unlock(&Q1Mutex);
+            pthread_mutex_unlock(&Q1Mutex); printf("\n +++++++ mutex unlock  +++++++ \n");
             break;
         }
 
@@ -461,7 +461,7 @@ void *serverMethod(void *args)
         
         packetsServed++;
         
-        pthread_mutex_unlock(&Q1Mutex);
+        pthread_mutex_unlock(&Q1Mutex); printf("\n +++++++ mutex unlock  +++++++ \n");
         
         gettimeofday(&dequePacket->serviceStartTime,NULL);
         elapsedTime = dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000000L - currentTime;
@@ -482,9 +482,9 @@ void *serverMethod(void *args)
 
         if (packetsServed == num || serveInterrupt) {
             if (packetsServed == num) {
-                pthread_mutex_lock(&Q1Mutex);
+                pthread_mutex_lock(&Q1Mutex); printf("\n ------ mutex lock taken ----- \n");
                 pthread_cond_broadcast(&serverQ);
-                pthread_mutex_unlock(&Q1Mutex);
+                pthread_mutex_unlock(&Q1Mutex); printf("\n +++++++ mutex unlock  +++++++ \n");
             }
             break;
         }
@@ -500,14 +500,14 @@ void *server2Method(void *args)
     
     while (1) {
         
-        pthread_mutex_lock(&Q1Mutex);
+        pthread_mutex_lock(&Q1Mutex); printf("\n ------ mutex lock taken ----- \n");
         
         while (My402ListEmpty(&Q2) && packetsServed != num && !serveInterrupt) {
             pthread_cond_wait(&serverQ, &Q1Mutex);
         }
         
         if (packetsServed == num || serveInterrupt) {
-            pthread_mutex_unlock(&Q1Mutex);
+            pthread_mutex_unlock(&Q1Mutex); printf("\n +++++++ mutex unlock  +++++++ \n");
             break;
         }
 
@@ -521,7 +521,7 @@ void *server2Method(void *args)
         
         packetsServed++;
         
-        pthread_mutex_unlock(&Q1Mutex);
+        pthread_mutex_unlock(&Q1Mutex); printf("\n +++++++ mutex unlock  +++++++ \n");
         
         gettimeofday(&dequePacket->serviceStartTime,NULL);
         elapsedTime = dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000000L - currentTime;
@@ -540,9 +540,9 @@ void *server2Method(void *args)
 
         if (packetsServed == num || serveInterrupt) {
             if (packetsServed == num) {
-                pthread_mutex_lock(&Q1Mutex);
+                pthread_mutex_lock(&Q1Mutex); printf("\n ------ mutex lock taken ----- \n");
                 pthread_cond_broadcast(&serverQ);
-                pthread_mutex_unlock(&Q1Mutex);
+                pthread_mutex_unlock(&Q1Mutex); printf("\n +++++++ mutex unlock  +++++++ \n");
             }
             break;
         }
@@ -571,13 +571,13 @@ void handleQuit(int signal)
     serveInterrupt = 1;
     pthread_cond_broadcast(&serverQ);
     
-    pthread_mutex_lock(&Q1Mutex);
+    pthread_mutex_lock(&Q1Mutex); printf("\n ------ mutex lock taken ----- \n");
     
     // traverse Q1 and Q2 to prompt delete
     My402ListUnlinkAll(&Q1);
     My402ListUnlinkAll(&Q2);
     
-    pthread_mutex_unlock(&Q1Mutex);
+    pthread_mutex_unlock(&Q1Mutex); printf("\n +++++++ mutex unlock  +++++++ \n");
     pthread_exit(0);
 }
 
