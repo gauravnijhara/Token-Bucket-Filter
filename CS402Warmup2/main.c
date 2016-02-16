@@ -354,7 +354,8 @@ void *packetArrivalMethod(void *args)
         elapsedTime = time.tv_sec + time.tv_usec*1000000L - currentTime;
 
     }
-	printf("\n packet thread exit \n");
+
+    printf("\n packet thread exit \n");
     pthread_exit(0);
     
 }
@@ -380,10 +381,8 @@ void *tokenArrivalMethod(void *args)
                 My402ListAppend(&tokenBucket,token);
             }
             
-            if (Q1.num_members <= 0) {
-                pthread_mutex_unlock(&Q1Mutex); 
-                continue;
-            }
+            if (!My402ListEmpty(&Q1)) {
+               
             
             packet *dequePacket = (packet*)My402ListFirst(&Q1)->obj;
 
@@ -416,7 +415,7 @@ void *tokenArrivalMethod(void *args)
                 if (!My402ListEmpty(&Q2)) {
                     pthread_cond_broadcast(&serverQ);
                 }
-            
+            }
             pthread_mutex_unlock(&Q1Mutex); 
             
             if (packetsServed == num) {
@@ -429,7 +428,8 @@ void *tokenArrivalMethod(void *args)
         elapsedTime = time.tv_sec + time.tv_usec*1000000L - currentTime;
 
     }
-   printf("\n token thread exit \n");
+
+    printf("\n token thread exit \n");
     pthread_exit(0);
 }
 
