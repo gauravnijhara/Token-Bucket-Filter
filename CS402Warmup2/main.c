@@ -467,6 +467,7 @@ void *serverMethod(void *args)
             if (packetsServed == num) {
                 pthread_cond_broadcast(&serverQ);
             }
+            printf("Emulation ends");
             break;
         }
        
@@ -519,6 +520,7 @@ void *server2Method(void *args)
             if (packetsServed == num) {
                 pthread_cond_broadcast(&serverQ);
             }
+            printf("Emulation ends");
             break;
         }
         
