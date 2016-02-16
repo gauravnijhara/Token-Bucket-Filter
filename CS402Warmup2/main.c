@@ -62,74 +62,79 @@ int main(int argc, const char * argv[]) {
         
         if (strcmp(argv[i],"-lambda") == 0) {
             
-            if ((i+1 != argc-1) && (1 == sscanf(argv[i+1],"%lf",&lambda))) {
+            if ((i+1 != argc) && (1 == sscanf(argv[i+1],"%lf",&lambda))) {
                 if (lambda < 0) {
                     fprintf(stderr,"Malformed Command , lambda value must be greater than 0");
                     exit(0);
                 }
+                i+=1;
             }else {
                 fprintf(stderr,"Malformed Command , lambda value not provided");
                 exit(0);
             }
         }else if (strcmp(argv[i],"-mu") == 0) {
             
-            if ((i+1 != argc-1) && (1 == sscanf(argv[i+1],"%lf",&mu))) {
-                if (lambda < 0) {
+            if ((i+1 != argc) && (1 == sscanf(argv[i+1],"%lf",&mu))) {
+                if (mu < 0) {
                     fprintf(stderr,"Malformed Command , Mu value must be greater than 0");
                     exit(0);
                 }
+                i+=1;
             }else {
                 fprintf(stderr,"Malformed Command , Mu value not provided");
                 exit(0);
             }
         }else if (strcmp(argv[i],"-r") == 0) {
             
-            if ((i+1 != argc-1) && (1 == sscanf(argv[i+1],"%lf",&r))) {
-                if (lambda < 0) {
+            if ((i+1 != argc) && (1 == sscanf(argv[i+1],"%lf",&r))) {
+                if (r < 0) {
                     fprintf(stderr,"Malformed Command , Rate of tokens must be greater than 0");
                     exit(0);
                 }
+                i+=1;
             }else {
                 fprintf(stderr,"Malformed Command , Rate of tokens value not provided");
                 exit(0);
             }
-        }else if (strcmp(argv[i],"-b") == 0) {
+        }else if (strcmp(argv[i],"-B") == 0) {
             
-            if ((i+1 != argc-1) && (1 == sscanf(argv[i+1],"%lf",&b))) {
-                if (lambda < 0) {
+            if ((i+1 != argc) && (1 == sscanf(argv[i+1],"%lf",&b))) {
+                if (b < 0) {
                     fprintf(stderr,"Malformed Command , Bucket size must be greater than 0");
                     exit(0);
                 }
+                i+=1;
             }else {
                 fprintf(stderr,"Malformed Command , Bucket size value not provided");
                 exit(0);
             }
-        }else if (strcmp(argv[i],"-p") == 0) {
+        }else if (strcmp(argv[i],"-P") == 0) {
             
-            if ((i+1 != argc-1) && (1 == sscanf(argv[i+1],"%lf",&p))) {
-                if (lambda < 0) {
+            if ((i+1 != argc) && (1 == sscanf(argv[i+1],"%lf",&p))) {
+                if (p < 0) {
                     fprintf(stderr,"Malformed Command , token per packet must be greater than 0");
                     exit(0);
                 }
+                i+=1;
             }else {
                 fprintf(stderr,"Malformed Command , tokens per packet value not provided");
                 exit(0);
             }
         }else if (strcmp(argv[i],"-n") == 0) {
             
-            if ((i+1 != argc-1) && (1 == sscanf(argv[i+1],"%lf",&num))) {
+            if ((i+1 != argc) && (1 == sscanf(argv[i+1],"%lf",&num))) {
                 if (num < 0) {
                     fprintf(stderr,"Malformed Command , Packet count must be greater than 0");
                     exit(0);
                 }
+                i+=1;
             }else {
                 fprintf(stderr,"Malformed Command , Packet count value not provided");
                 exit(0);
             }
         }else if (strcmp(argv[i],"-t") == 0) {
         
-            if ((i+1 != argc-1) && (1 == sscanf(argv[i+1],"%s",fileName))) {
-                
+            if ((i+1 != argc) && (1 == sscanf(argv[i+1],"%s",fileName))) {
                 
                 isTraceFileMode = 1;
                 
@@ -143,7 +148,7 @@ int main(int argc, const char * argv[]) {
                         if(access(fileName,R_OK) != 0)
                         {
                             fprintf(stderr, " Input file %s cannot be opened : access denied \n",fileName);
-                            exit(1);
+                            exit(0);
                         }
                         else
                         {
@@ -216,7 +221,8 @@ int main(int argc, const char * argv[]) {
                     fprintf(stderr, " Input file should be %s does not exist \n",fileName);
                     exit(1);
                 }
-
+                
+                i+=1;
             }else {
                 fprintf(stderr,"Malformed Command , Filename not in proper format ");
                 exit(0);
@@ -229,7 +235,7 @@ int main(int argc, const char * argv[]) {
     }
     
     if (!isTraceFileMode) {
-        
+        packetList = (packet**)malloc(sizeof(num));
         for (int i = 0; i < num; i++) {
             packet *newPacket = (packet*)malloc(sizeof(packet));
             newPacket->ID = i+1;
@@ -467,7 +473,7 @@ void *serverMethod(void *args)
             if (packetsServed == num) {
                 pthread_cond_broadcast(&serverQ);
             }
-            printf("Emulation ends");
+                printf("Emulation ends");
             break;
         }
        
