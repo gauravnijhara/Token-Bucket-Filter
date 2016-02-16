@@ -464,7 +464,7 @@ void *serverMethod(void *args)
 
         printf("\n p%d begins service at S1, requesting %dms of service",dequePacket->ID,100);
      
-        usleep((unsigned int)fabs((1/mu)*1000000L - elapsedTime/1000000L));
+        usleep((unsigned int)fabs((dequePacket->serviceTime)*1000000L - elapsedTime/1000000L));
 
         gettimeofday(&dequePacket->serviceEndTime,NULL);
         currentTime = dequePacket->serviceEndTime.tv_sec + dequePacket->serviceEndTime.tv_usec*1000000L;
@@ -517,7 +517,7 @@ void *server2Method(void *args)
         
         printf("\n p%d begins service at S2, requesting %dms of service",dequePacket->ID,100);
         
-        usleep((unsigned int)fabs((1/mu)*1000000L - elapsedTime/1000000L));
+        usleep((unsigned int)fabs((dequePacket->serviceTime)*1000000L - elapsedTime/1000000L));
         
         gettimeofday(&dequePacket->serviceEndTime,NULL);
         currentTime = dequePacket->serviceEndTime.tv_sec + dequePacket->serviceEndTime.tv_usec*1000000L;
