@@ -733,14 +733,14 @@ void printStats()
     if (!totalTokenGenerated) {
         printf("\ntoken drop probability = No tokens generated");
     }else {
-        float num = droppedTokens/totalTokenGenerated;
+        float num = ((float)droppedTokens)/((float)totalTokenGenerated);
         printf("\ntoken drop probability = %f\n",num);
     }
     
     if (!packetCount) {
         printf("packet drop probability = No packets in system ");
     }else {
-        float num = droppedPackets/packetCount;
+        float num = ((float)droppedPackets)/((float)packetCount);
         printf("packet drop probability = %f\n",num);
     }
     
