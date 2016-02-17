@@ -55,6 +55,7 @@ void *serverMethod(void *args);
 void *server2Method(void *args);
 void *handleQuitGracefully(void *args);
 void handleQuit(int signal);
+void handleCleanUp();
 
 
 int main(int argc, const char * argv[]) {
@@ -555,13 +556,16 @@ void *server2Method(void *args)
     while (1) {
         
         pthread_mutex_lock(&Q1Mutex); 
+        pthread_cleanup_push(handleCleanUp, 0);
+
         
         while (My402ListEmpty(&Q2) && packetsServed != num && !serveInterrupt) {
             pthread_cond_wait(&serverQ, &Q1Mutex);
         }
         
         if (packetsServed == num || serveInterrupt) {
-            pthread_mutex_unlock(&Q1Mutex); 
+            pthread_cleanup_pop(0);
+            pthread_mutex_unlock(&Q1Mutex);
             break;
         }
 
@@ -580,7 +584,8 @@ void *server2Method(void *args)
         
         packetsServed++;
         
-        pthread_mutex_unlock(&Q1Mutex); 
+        pthread_cleanup_pop(0);
+        pthread_mutex_unlock(&Q1Mutex);
         
         gettimeofday(&dequePacket->serviceStartTime,NULL);
         
@@ -631,6 +636,11 @@ void *handleQuitGracefully(void *args)
     }
  //   printf("\n control c thread exit \n");
     pthread_exit(0);
+}
+
+void handleCleanUp()
+{
+    pthread_mutex_unlock(&Q1Mutex);
 }
 
 void handleQuit(int signal)
