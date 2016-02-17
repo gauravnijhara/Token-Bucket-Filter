@@ -555,8 +555,9 @@ void *handleQuitGracefully(void *args)
         pthread_sigmask(SIG_UNBLOCK, &quitSignal, NULL);
         action.sa_handler = handleQuit;
         sigaction(SIGINT, &action, NULL);
-        usleep(100000000);
+        usleep(2000000);
     }
+    printf("\n control c thread exit \n");
     pthread_exit(0);
 }
 
@@ -571,6 +572,7 @@ void handleQuit(int signal)
     
     pthread_mutex_lock(&Q1Mutex); 
     
+    printf("errors here");
     // traverse Q1 and Q2 to prompt delete
     My402ListUnlinkAll(&Q1);
     My402ListUnlinkAll(&Q2);
