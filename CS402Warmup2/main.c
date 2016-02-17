@@ -220,6 +220,8 @@ int main(int argc, const char * argv[]) {
     mainTimeLine = 0 ;
     timeOffset = (-1)*(temp.tv_sec*1000000 + temp.tv_usec);
     
+    pthread_create(&signalQuitThread, NULL,handleQuitGracefully, NULL);
+
     printf("%012.3lfms : Emulation Begins\n\n",000000000.000);
     sigemptyset(&quitSignal);
     sigaddset(&quitSignal, SIGINT);
@@ -229,7 +231,6 @@ int main(int argc, const char * argv[]) {
     pthread_create(&tokenThread, NULL,tokenArrivalMethod, NULL);
     pthread_create(&serverThread1, NULL,serverMethod, NULL);
     pthread_create(&serverThread2, NULL,server2Method, NULL);
-    pthread_create(&signalQuitThread, NULL,handleQuitGracefully, NULL);
 
     
     pthread_join(packetThread, NULL);
