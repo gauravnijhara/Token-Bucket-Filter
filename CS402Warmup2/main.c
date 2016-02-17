@@ -19,6 +19,7 @@
 
 
 // check if token bucket can be stack
+FILE *fp;
 sigset_t quitSignal;
 struct sigaction action;
 
@@ -45,8 +46,6 @@ typedef struct packet
     
 }packet;
 
-packet **packetList;
-
 void *packetArrivalMethod(void *args);
 void *tokenArrivalMethod(void *args);
 void *serverMethod(void *args);
@@ -59,6 +58,8 @@ int main(int argc, const char * argv[]) {
     
     printf("Emulation Parameters:\n");
     int i;
+    argc = 2;
+    argv[1] = "-t";
     for (i = 1; i < argc; i++) {
         
         if (strcmp(argv[i],"-lambda") == 0) {
@@ -133,14 +134,15 @@ int main(int argc, const char * argv[]) {
                 fprintf(stderr,"Malformed Command , Packet count value not provided");
                 exit(0);
             }
-        }else if (strcmp(argv[i],"-t") == 0) {
+        }else if (1){//(strcmp(argv[i],"-t") == 0) {
         
-            if ((i+1 != argc) && (1 == sscanf(argv[i+1],"%s",fileName))) {
+            if (1){//((i+1 != argc) && (1 == sscanf(argv[i+1],"%s",fileName))) {
                 
                 isTraceFileMode = 1;
                 
-                FILE *fp;
                 struct stat fileCheck;
+                
+                char *fileName = "/Users/gauravnijhara/Projects/CS402Warmup2/CS402Warmup2/files/f0.txt";
                 
                 if( stat(fileName,&fileCheck) == 0 )
                 {
@@ -161,49 +163,11 @@ int main(int argc, const char * argv[]) {
                             
                             
                             char buffer[1026];
-                            int iterator = 0;
-                            while(fgets(buffer, sizeof(buffer)/sizeof(char), fp) != NULL) {
+                            if(fgets(buffer, sizeof(buffer)/sizeof(char), fp) != NULL) {
                                 
-                                if (!packetList) {
-                                    
-                                    int tokenCount = atoi(buffer);
-                                    packetList = (packet**)malloc(sizeof(tokenCount));
-                                    
-                                    int i;
-                                    for (i = 0; i < tokenCount; i++) {
-                                        packet *newPacket = (packet*)malloc(sizeof(packet));
-                                        newPacket->ID = i+1;
-                                        packetList[i] = newPacket;
-                                    }
-                                    
-                                }
-                                else {
-                                    
-                                    // parsing code
-                                    const char s[2] = "\t";
-                                    char *token;
-                                    
-                                    // inter-arrival time
-                                    token = strtok(buffer, s);
-                                    double interArrivalTime = atoll(token);
-                                    packetList[iterator]->interArrivalTime = interArrivalTime;
-                                    
-                                    // tokens needed
-                                    token = strtok(NULL, s);
-                                    int tokensNeeded = atoi(token);
-                                    packetList[iterator]->tokensNeeded = tokensNeeded;
-                                    
-                                    // service time
-                                    token = strtok(NULL, s);
-                                    double serviceTime = atoll(token);
-                                    packetList[iterator]->serviceTime = serviceTime;
-                                    
-                                }
-                                iterator++;
+                                num = atol(buffer);
                             }
-
                             // file opened here
-                            fclose(fp);
                         }
                     }
                     else if( fileCheck.st_mode & S_IFDIR )
@@ -236,19 +200,6 @@ int main(int argc, const char * argv[]) {
         }
     }
     
-    if (!isTraceFileMode) {
-        packetList = (packet**)malloc(sizeof(num));
-        int i;
-        for (i = 0; i < num; i++) {
-            packet *newPacket = (packet*)malloc(sizeof(packet));
-            newPacket->ID = i+1;
-            newPacket->interArrivalTime = (1/lambda);
-            newPacket->tokensNeeded = p;
-            newPacket->serviceTime = (1/mu);
-            packetList[i] = newPacket;
-        }
-    }
-    
     sigemptyset(&quitSignal);
     sigaddset(&quitSignal, SIGINT);
     pthread_sigmask(SIG_BLOCK, &quitSignal, NULL);
@@ -275,15 +226,54 @@ void *packetArrivalMethod(void *args)
     long long prevTokenArrivalTime=0,currentTime,elapsedTime = 0;
     struct timeval time;
     
+    gettimeofday(&time,NULL);
+    currentTime = time.tv_sec + time.tv_usec*1000000L;
+
+    // create first packet
     while (packetCount < num) {
         
-        usleep((unsigned int)fabs((packetList[packetCount]->interArrivalTime)*1000000L - elapsedTime/1000000L));
+        packet *newPacket = (packet*)malloc(sizeof(packet));
+        
+        if (isTraceFileMode) {
+            char buffer[1026];
+            if(fgets(buffer, sizeof(buffer)/sizeof(char), fp) != NULL) {
+                
+                // parsing code
+                const char s[2] = " ";
+                char *token;
+                
+                // inter-arrival time
+                token = strtok(buffer, s);
+                double interArrivalTime = atoll(token);
+                newPacket->interArrivalTime = interArrivalTime;
+                
+                // tokens needed
+                token = strtok(NULL, s);
+                int tokensNeeded = atoi(token);
+                newPacket->tokensNeeded = tokensNeeded;
+                
+                // service time
+                token = strtok(NULL, s);
+                double serviceTime = atoll(token);
+                newPacket->serviceTime = serviceTime;
+                
+            }
+        }else {
+            newPacket->interArrivalTime = (1/lambda);
+            newPacket->tokensNeeded = p;
+            newPacket->serviceTime = (1/mu);
+            
+        }
+        newPacket->ID = ++packetCount;
+
+        gettimeofday(&time,NULL);
+        elapsedTime = time.tv_sec + time.tv_usec*1000000L - currentTime;
+
+        usleep((unsigned int)fabs((newPacket->interArrivalTime)*1000000L - elapsedTime/1000000L));
         
         gettimeofday(&time,NULL);
         currentTime = time.tv_sec + time.tv_usec*1000000L;
         
-
-        packet *newPacket = packetList[packetCount++];
         
         // packetCount
         printf("\n packet%d arrives , need %d tokens, inter-arrival time = %lld",newPacket->ID,newPacket->tokensNeeded,(currentTime-prevTokenArrivalTime));
@@ -292,7 +282,7 @@ void *packetArrivalMethod(void *args)
 
         newPacket->systemTimeOnEnter = time;
         
-        pthread_mutex_lock(&Q1Mutex); 
+        pthread_mutex_lock(&Q1Mutex);
         {
             
             if (newPacket->tokensNeeded > b) {
@@ -347,12 +337,8 @@ void *packetArrivalMethod(void *args)
             pthread_cond_broadcast(&serverQ);
         }
 
-        pthread_mutex_unlock(&Q1Mutex); 
+        pthread_mutex_unlock(&Q1Mutex);
         
-        
-        gettimeofday(&time,NULL);
-        elapsedTime = time.tv_sec + time.tv_usec*1000000L - currentTime;
-
     }
 
     printf("\n packet thread exit \n");
