@@ -267,7 +267,7 @@ void *packetArrivalMethod(void *args)
                 
                 // inter-arrival time
                 token = strtok(buffer, s);
-                double interArrivalTime = atoll(token);
+                double interArrivalTime = atof(token)*1000;
                 newPacket->interArrivalTime = interArrivalTime;
                 
                 // tokens needed
@@ -277,7 +277,7 @@ void *packetArrivalMethod(void *args)
                 
                 // service time
                 token = strtok(NULL, s);
-                double serviceTime = atoll(token);
+                double serviceTime = atof(token)*1000;
                 newPacket->serviceTime = serviceTime;
                 
             }
@@ -292,9 +292,9 @@ void *packetArrivalMethod(void *args)
         gettimeofday(&time,NULL);
         elapsedTime = time.tv_sec*1000000 + time.tv_usec - currentTime;
 
-        long int sleeptime = ((newPacket->interArrivalTime)*1000 - elapsedTime);
+        long int sleeptime = ((newPacket->interArrivalTime) - elapsedTime);
         
-        printf("\n------%d------\n",(unsigned int)sleeptime);
+     //   printf("\n------%d------\n",(unsigned int)sleeptime);
         usleep((sleeptime<0)?0:(unsigned int)sleeptime);
         
         gettimeofday(&time,NULL);
@@ -388,7 +388,7 @@ void *tokenArrivalMethod(void *args)
         
         long int sleeptime = ((1/r)*1000000 - elapsedTime);
 
-        printf("\n------%d token------\n",(unsigned int)sleeptime);
+      //  printf("\n------%d token------\n",(unsigned int)sleeptime);
         
         usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
 
@@ -510,9 +510,9 @@ void *serverMethod(void *args)
      
 	//printf("my sleep time is %lf",dequePacket->serviceTime);
 
-        long int sleeptime = (dequePacket->serviceTime)*1000000 - elapsedTime;
+        long int sleeptime = (dequePacket->serviceTime) - elapsedTime;
 
-        printf("\n------%d server 1 ------\n",(unsigned int)sleeptime);
+      //  printf("\n------%d server 1 ------\n",(unsigned int)sleeptime);
 
         usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
 
@@ -580,9 +580,9 @@ void *server2Method(void *args)
 
         printf("%012.3lfms : p%d begins service at S2, requesting %dms of service\n",mainTimeLine,dequePacket->ID,100);
         
-        long int sleeptime = (dequePacket->serviceTime)*1000000 - elapsedTime;
+        long int sleeptime = (dequePacket->serviceTime) - elapsedTime;
         
-        printf("\n------%d server 2 ------\n",(unsigned int)sleeptime);
+       // printf("\n------%d server 2 ------\n",(unsigned int)sleeptime);
 
         usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
 
