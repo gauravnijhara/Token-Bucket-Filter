@@ -384,7 +384,10 @@ void *packetArrivalMethod(void *args)
         
         
     }
-
+    
+    if (fp) {
+        fclose(fp);
+    }
     //printf("\n packet thread exit \n");
     pthread_exit(0);
     
