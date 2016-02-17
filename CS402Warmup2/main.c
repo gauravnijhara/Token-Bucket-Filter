@@ -292,7 +292,7 @@ void *packetArrivalMethod(void *args)
         gettimeofday(&time,NULL);
         elapsedTime = time.tv_sec*1000000 + time.tv_usec - currentTime;
 
-        long int sleeptime = ((newPacket->interArrivalTime)*1000L - elapsedTime/1000000);
+        long int sleeptime = ((newPacket->interArrivalTime)*1000 - elapsedTime/1000);
         
         printf("------\n%ld\n------",sleeptime);
         usleep((sleeptime<0)?0:(unsigned int)sleeptime);
@@ -347,7 +347,7 @@ void *packetArrivalMethod(void *args)
                 gettimeofday(&temp, NULL);
                 mainTimeLine = (temp.tv_sec*1000000 + temp.tv_usec + timeOffset)/1000;
                 
-                printf("%012.3lfms : p%d leaves Q1, time in Q1 = %08.3lfms, token bucket now has %d token\n",mainTimeLine,newPacket->ID,((double)((temp.tv_sec + temp.tv_usec*1000000) - (newPacket->Q1EnterTime.tv_sec + newPacket->Q1EnterTime.tv_usec*1000000)))/1000,Q1.num_members);
+                printf("%012.3lfms : p%d leaves Q1, time in Q1 = %08.3lfms, token bucket now has %d token\n",mainTimeLine,newPacket->ID,((double)((temp.tv_sec*1000000 + temp.tv_usec) - (newPacket->Q1EnterTime.tv_sec*1000000 + newPacket->Q1EnterTime.tv_usec)))/1000,Q1.num_members);
                 
                 pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
                 My402ListUnlink(&Q1, My402ListFirst(&Q1));
@@ -386,12 +386,12 @@ void *tokenArrivalMethod(void *args)
 
     while (packetsServed < num || !serveInterrupt) {
         
-        long int sleeptime = ((1/r)*1000000 -elapsedTime/1000000);
-        
+        long int sleeptime = ((1/r)*1000 -elapsedTime/1000);
+
         usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
 
         gettimeofday(&time,NULL);
-        currentTime = time.tv_sec + time.tv_usec*1000000;
+        currentTime = time.tv_sec*1000000 + time.tv_usec;
 
         pthread_mutex_lock(&Q1Mutex); 
         {
@@ -508,7 +508,7 @@ void *serverMethod(void *args)
      
 	//printf("my sleep time is %lf",dequePacket->serviceTime);
 
-        long int sleeptime = (dequePacket->serviceTime)*1000 - elapsedTime/1000000;
+        long int sleeptime = (dequePacket->serviceTime)*1000 - elapsedTime/1000;
 
         usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
 
@@ -519,7 +519,7 @@ void *serverMethod(void *args)
 
 	//printf("packets : %d , num : %ld",packetsServed,num);
 
-        printf("%012.3lfms : p%d departs from S1, service time = %08.3lfms , time in system = %08.3lfms\n",mainTimeLine,dequePacket->ID,((double)(currentTime - (dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000000)))/1000,((double)((dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec) - (dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec)))/1000);
+        printf("%012.3lfms : p%d departs from S1, service time = %08.3lfms , time in system = %08.3lfms\n",mainTimeLine,dequePacket->ID,((double)(currentTime - (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec)))/1000,((double)((dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec) - (dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec)))/1000);
         
 
         if (packetsServed == num || serveInterrupt) {
@@ -570,19 +570,19 @@ void *server2Method(void *args)
         pthread_mutex_unlock(&Q1Mutex); 
         
         gettimeofday(&dequePacket->serviceStartTime,NULL);
-        elapsedTime = dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000000 - currentTime;
+        elapsedTime = dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec - currentTime;
         
         mainTimeLine = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec + timeOffset)/1000;
 
         printf("%012.3lfms : p%d begins service at S2, requesting %dms of service\n",mainTimeLine,dequePacket->ID,100);
         
-        long int sleeptime = (dequePacket->serviceTime)*1000L - elapsedTime/1000000;
+        long int sleeptime = (dequePacket->serviceTime)*1000 - elapsedTime/1000;
         
         usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
 
         
         gettimeofday(&dequePacket->serviceEndTime,NULL);
-        currentTime = dequePacket->serviceEndTime.tv_sec + dequePacket->serviceEndTime.tv_usec*1000000;
+        currentTime = dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec;
         
 	//printf("packets : %d , num : %ld",packetsServed,num);
 
