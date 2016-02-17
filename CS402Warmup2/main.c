@@ -715,7 +715,7 @@ void printStats()
         printf("average packet service time = %.6g ms\n",((totalTimeInS1+totalTimeInS2)/(packetCount-droppedPackets)));
     }
 
-    printf("total time in Q1 is %d",totalTimeInQ1);
+    printf("total time in Q1 is %f",totalTimeInQ1);
     printf("\naverage number of packets in Q1 = %.6g packets\n",(totalTimeInQ1/mainTimeLine));
     printf("average number of packets in Q2 = %.6g packets\n",(totalTimeInQ2/mainTimeLine));
     printf("average number of packets in S1 = %.6g packets\n",(totalTimeInS1/mainTimeLine));
