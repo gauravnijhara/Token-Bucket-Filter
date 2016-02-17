@@ -190,6 +190,11 @@ int main(int argc, const char * argv[]) {
                                 
                                 num = atol(buffer);
                             }
+                            
+                            if (num == 0) {
+                                fprintf(stderr, "input file : %s is not in the right format \n",fileName);
+                                exit(1);
+                            }
                             // file opened here
                         }
                     }
@@ -444,8 +449,17 @@ void *tokenArrivalMethod(void *args)
                 pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
                 My402ListAppend(&tokenBucket,token);
                 pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
+                struct timeval temp;
+                gettimeofday(&temp, NULL);
+                mainTimeLine = (temp.tv_sec*1000000 + temp.tv_usec + timeOffset)/1000;
+                printf("%012.3lfms : Token t%d arrives, token bucket now has %d tokens \n",mainTimeLine,totalTokenGenerated,tokenBucket.num_members);
             }else {
                 droppedTokens++;
+                struct timeval temp;
+                gettimeofday(&temp, NULL);
+                mainTimeLine = (temp.tv_sec*1000000 + temp.tv_usec + timeOffset)/1000;
+                printf("%012.3lfms : Token t%d arrives, dropped \n ",mainTimeLine,totalTokenGenerated);
+
             }
             
             if (!My402ListEmpty(&Q1)) {
