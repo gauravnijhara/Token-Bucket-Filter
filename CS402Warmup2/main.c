@@ -16,6 +16,7 @@
 #include <math.h>
 #include "string.h"
 #include <signal.h>
+#include "math.h"
 
 
 // check if token bucket can be stack
@@ -27,10 +28,13 @@ My402List Q1,Q2,tokenBucket;
 pthread_mutex_t Q1Mutex;
 pthread_cond_t serverQ;
 unsigned int packetCount = 0;
+unsigned int droppedPackets = 0;
 unsigned int packetsServed = 0;
 unsigned int serveInterrupt = 0;
 unsigned int isTraceFileMode = 0;
 unsigned int allThreadsKilled = 0;
+unsigned int totalTokenGenerated = 0;
+unsigned int droppedTokens = 0;
 
 double lambda = 1,mu = 0.35,r = 1.5, b = 10 ,p = 3;
 long int num = 20;
@@ -38,6 +42,15 @@ char fileName[128];
 pthread_t packetThread,tokenThread,serverThread1,serverThread2,signalQuitThread;
 double mainTimeLine = 0;
 double timeOffset = 0;
+
+long double totalTimeInQ1 = 0;
+long double totalTimeInQ2 = 0;
+long double totalTimeInS1 = 0;
+long double totalTimeInS2 = 0;
+long double totalTimeSpentInSystem = 0;
+long double totalInterArrivalTime = 0;
+long double totalServiceTime = 0;
+long double squareOfSystemTime = 0;
 
 typedef struct packet
 {
@@ -56,6 +69,8 @@ void *server2Method(void *args);
 void *handleQuitGracefully(void *args);
 void handleQuit(int signal);
 void handleCleanUp();
+void printStats();
+
 
 
 int main(int argc, const char * argv[]) {
@@ -242,6 +257,8 @@ int main(int argc, const char * argv[]) {
     pthread_join(signalQuitThread,NULL);
     
     printf("%012.3lfms : Emulation ends\n\n\n",mainTimeLine);
+    
+    printStats();
     pthread_exit(0);
 }
 
@@ -307,15 +324,15 @@ void *packetArrivalMethod(void *args)
         
         
         // packetCount
-        
+        totalInterArrivalTime += ((double)(currentTime-prevTokenArrivalTime))/1000;
         if (newPacket->tokensNeeded > b) {
+            droppedPackets++;
             packetsServed++;
             printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms, dropped\n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/1000);
             continue;
 
         }else {
             printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms \n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/1000);
-
         }
 
         prevTokenArrivalTime = currentTime;
@@ -359,6 +376,8 @@ void *packetArrivalMethod(void *args)
 
                 printf("%012.3lfms : p%d leaves Q1, time in Q1 = %08.3lfms, token bucket now has %d token\n",mainTimeLine,newPacket->ID,((double)((temp.tv_sec*1000000 + temp.tv_usec) - (newPacket->Q1EnterTime.tv_sec*1000000 + newPacket->Q1EnterTime.tv_usec)))/1000,Q1.num_members);
 
+                totalTimeInQ1 += ((double)((temp.tv_sec*1000000 + temp.tv_usec) - (newPacket->Q1EnterTime.tv_sec*1000000 + newPacket->Q1EnterTime.tv_usec)))/1000;
+            
                 
                 pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
                 My402ListAppend(&Q2,(packet*)newPacket);
@@ -413,10 +432,13 @@ void *tokenArrivalMethod(void *args)
 
             pthread_cleanup_push(handleCleanUp, 0);
             if (tokenBucket.num_members <= b) {
-                //int *token = (int*)malloc(sizeof(int));
+                int *token = (int*)malloc(sizeof(int));
                 pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
-                My402ListAppend(&tokenBucket,NULL);
+                My402ListAppend(&tokenBucket,token);
+                totalTokenGenerated++;
                 pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
+            }else {
+                droppedTokens++;
             }
             
             if (!My402ListEmpty(&Q1)) {
@@ -515,6 +537,8 @@ void *serverMethod(void *args)
 
         printf("%012.3lfms : p%d leaves Q2, time in Q2 = %08.3lfms\n",mainTimeLine,dequePacket->ID,((double)((temp.tv_sec*1000000 + temp.tv_usec) - (dequePacket->Q2EnterTime.tv_sec*1000000 + dequePacket->Q2EnterTime.tv_usec)))/1000);
         
+        totalTimeInQ2 += ((double)((temp.tv_sec*1000000 + temp.tv_usec) - (dequePacket->Q2EnterTime.tv_sec*1000000 + dequePacket->Q2EnterTime.tv_usec)))/1000;
+        
         packetsServed++;
         
         pthread_mutex_unlock(&Q1Mutex); 
@@ -537,6 +561,12 @@ void *serverMethod(void *args)
 
 
         printf("%012.3lfms : p%d departs from S1, service time = %08.3lfms , time in system = %08.3lfms\n",mainTimeLine,dequePacket->ID,((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec)))/1000,((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->Q1EnterTime.tv_sec*1000000 + dequePacket->Q1EnterTime.tv_usec)))/1000);
+        
+        totalTimeInS1 += ((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec)))/1000;
+        
+        totalTimeSpentInSystem += ((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->Q1EnterTime.tv_sec*1000000 + dequePacket->Q1EnterTime.tv_usec)))/1000;
+        
+        squareOfSystemTime += totalTimeSpentInSystem*totalTimeSpentInSystem;
         
         if (packetsServed == num || serveInterrupt) {
             if (packetsServed == num) {
@@ -583,6 +613,8 @@ void *server2Method(void *args)
 
         printf("%012.3lfms : p%d leaves Q2, time in Q2 = %08.3lfms\n",mainTimeLine,dequePacket->ID,((double)(temp.tv_sec*1000000 + temp.tv_usec) - (dequePacket->Q2EnterTime.tv_sec*1000000 + dequePacket->Q2EnterTime.tv_usec))/1000);
         
+        totalTimeInQ2 += ((double)((temp.tv_sec*1000000 + temp.tv_usec) - (dequePacket->Q2EnterTime.tv_sec*1000000 + dequePacket->Q2EnterTime.tv_usec)))/1000;
+
         packetsServed++;
         
         pthread_mutex_unlock(&Q1Mutex);
@@ -607,6 +639,9 @@ void *server2Method(void *args)
 
            printf("%012.3lfms : p%d departs from S2, service time = %08.3lfms , time in system = %08.3lfms\n",mainTimeLine,dequePacket->ID,((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec)))/1000,((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->Q1EnterTime.tv_sec*1000000 + dequePacket->Q1EnterTime.tv_usec)))/1000);
 
+        totalTimeInS2 += ((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec)))/1000;
+
+        totalTimeSpentInSystem += ((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->Q1EnterTime.tv_sec*1000000 + dequePacket->Q1EnterTime.tv_usec)))/1000;
 
         if (packetsServed == num || serveInterrupt) {
             if (packetsServed == num) {
@@ -649,6 +684,9 @@ void handleQuit(int signal)
     
     pthread_mutex_lock(&Q1Mutex); 
     
+    for (int i = 0; i < Q1.num_members; i++) {
+        
+    }
     printf("errors here");
     // traverse Q1 and Q2 to prompt delete
   //  My402ListUnlinkAll(&Q1);
@@ -658,3 +696,25 @@ void handleQuit(int signal)
     pthread_exit(0);
 }
 
+void printStats()
+{
+    printf("\n\n Statistics: \n\n");
+    
+    printf("\naverage packet inter arrival time = %LF\n",(totalInterArrivalTime/packetCount));
+    printf("average packet service time = %LF\n",((totalTimeInS1+totalTimeInS2)/(packetCount-droppedPackets)));
+
+    printf("\naverage number of packets in Q1 = %Lf\n",(totalTimeInQ1/mainTimeLine));
+    printf("average number of packets in Q2 = %Lf\n",(totalTimeInQ2/mainTimeLine));
+    printf("average number of packets in S1 = %Lf\n",(totalTimeInS1/mainTimeLine));
+    printf("average number of packets in S2 = %Lf\n",(totalTimeInS2/mainTimeLine));
+    printf("average number of packets in S2 = %Lf\n",(totalTimeInS2/mainTimeLine));
+    
+    printf("\naverage time a packet spent in system = %LF\n",(totalTimeSpentInSystem/(packetCount-droppedPackets)));
+    printf("standard deviation for time spent in system = %LF\n",sqrtl((squareOfSystemTime/(packetCount-droppedTokens))-((totalTimeSpentInSystem/(packetCount-droppedPackets))*(totalTimeSpentInSystem/(packetCount-droppedPackets)))));
+    
+    printf("\ntoken drop probability = %u\n",(droppedTokens/(totalTokenGenerated)));
+    printf("packet drop probability = %u\n",(droppedPackets/(packetCount)));
+
+    
+    
+}
