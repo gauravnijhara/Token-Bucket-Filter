@@ -134,16 +134,14 @@ int main(int argc, const char * argv[]) {
                 fprintf(stderr,"Malformed Command , Packet count value not provided");
                 exit(0);
             }
-        }else if (1){//(strcmp(argv[i],"-t") == 0) {
+        }else if (strcmp(argv[i],"-t") == 0) {
         
-            if (1){//((i+1 != argc) && (1 == sscanf(argv[i+1],"%s",fileName))) {
+            if ((i+1 != argc) && (1 == sscanf(argv[i+1],"%s",fileName))) {
                 
                 isTraceFileMode = 1;
                 
                 struct stat fileCheck;
-                
-                char *fileName = "/Users/gauravnijhara/Projects/CS402Warmup2/CS402Warmup2/files/f0.txt";
-                
+                                
                 if( stat(fileName,&fileCheck) == 0 )
                 {
                     if( fileCheck.st_mode & S_IFREG )
