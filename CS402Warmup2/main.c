@@ -292,9 +292,9 @@ void *packetArrivalMethod(void *args)
         gettimeofday(&time,NULL);
         elapsedTime = time.tv_sec*1000000 + time.tv_usec - currentTime;
 
-        long int sleeptime = ((newPacket->interArrivalTime)*1000 - elapsedTime/1000);
+        long int sleeptime = ((newPacket->interArrivalTime)*1000 - elapsedTime);
         
-        printf("------\n%ld\n------",sleeptime);
+        printf("\n------%d------\n",(unsigned int)sleeptime);
         usleep((sleeptime<0)?0:(unsigned int)sleeptime);
         
         gettimeofday(&time,NULL);
@@ -386,8 +386,10 @@ void *tokenArrivalMethod(void *args)
 
     while (packetsServed < num || !serveInterrupt) {
         
-        long int sleeptime = ((1/r)*1000 -elapsedTime/1000);
+        long int sleeptime = ((1/r)*1000000 - elapsedTime);
 
+        printf("\n------%d token------\n",(unsigned int)sleeptime);
+        
         usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
 
         gettimeofday(&time,NULL);
@@ -508,7 +510,9 @@ void *serverMethod(void *args)
      
 	//printf("my sleep time is %lf",dequePacket->serviceTime);
 
-        long int sleeptime = (dequePacket->serviceTime)*1000 - elapsedTime/1000;
+        long int sleeptime = (dequePacket->serviceTime)*1000000 - elapsedTime;
+
+        printf("\n------%d server 1 ------\n",(unsigned int)sleeptime);
 
         usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
 
@@ -576,8 +580,10 @@ void *server2Method(void *args)
 
         printf("%012.3lfms : p%d begins service at S2, requesting %dms of service\n",mainTimeLine,dequePacket->ID,100);
         
-        long int sleeptime = (dequePacket->serviceTime)*1000 - elapsedTime/1000;
+        long int sleeptime = (dequePacket->serviceTime)*1000000 - elapsedTime;
         
+        printf("\n------%d server 2 ------\n",(unsigned int)sleeptime);
+
         usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
 
         
