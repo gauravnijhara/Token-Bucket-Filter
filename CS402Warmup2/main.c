@@ -740,7 +740,7 @@ void printStats()
     if (!(packetCount-droppedPackets)) {
         printf("\n\t\taverage time a packet spent in system = All packets dropped or no packets in system");
     }else {
-        printf("\n\t\taverage time a packet spent in system = %.6g ms\n",(totalTimeSpentInSystem/(packetCount-droppedPackets)));
+        printf("\n\t\taverage time a packet spent in system = %.6g ms\n",(totalTimeSpentInSystem/(packetsServed-droppedPackets)));
     }
     
     
@@ -749,7 +749,7 @@ void printStats()
 
     }
     else {
-        printf("\t\tstandard deviation for time spent in system = %.6g\n",sqrt((squareOfSystemTime/(packetsServed-droppedTokens))- (((totalTimeSpentInSystem/(packetsServed-droppedPackets))*(totalTimeSpentInSystem/(packetCount-droppedPackets)))))/1000);
+        printf("\t\tstandard deviation for time spent in system = %.6g\n",sqrt((squareOfSystemTime/(packetsServed-droppedTokens))- (((totalTimeSpentInSystem/(packetsServed-droppedPackets))*(totalTimeSpentInSystem/(packetsServed-droppedPackets)))))/1000);
     }
     
     
