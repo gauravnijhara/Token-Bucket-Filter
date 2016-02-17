@@ -294,7 +294,7 @@ void *packetArrivalMethod(void *args)
 
         long int sleeptime = ((newPacket->interArrivalTime) - elapsedTime);
         
-        printf("\n sleeptime %ld \n",sleeptime);
+      //  printf("\n sleeptime %ld \n",sleeptime);
         
      //   printf("\n------%d------\n",(unsigned int)sleeptime);
         usleep((sleeptime<0)?0:(unsigned int)sleeptime);
