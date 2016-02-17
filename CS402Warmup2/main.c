@@ -250,6 +250,7 @@ void *packetArrivalMethod(void *args)
     
     gettimeofday(&time,NULL);
     currentTime = time.tv_sec + time.tv_usec*1000000L;
+    prevTokenArrivalTime = currentTime;
 
     // create first packet
     while (packetCount < num) {
