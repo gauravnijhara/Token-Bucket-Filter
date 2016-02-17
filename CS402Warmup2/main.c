@@ -140,6 +140,8 @@ int main(int argc, const char * argv[]) {
                 
                 struct stat fileCheck;
                 
+               // char *fileName = "/Users/gauravnijhara/Projects/CS402Warmup2/CS402Warmup2/files/f0.txt";
+                
                 if( stat(fileName,&fileCheck) == 0 )
                 {
                     if( fileCheck.st_mode & S_IFREG )
@@ -265,7 +267,9 @@ void *packetArrivalMethod(void *args)
         gettimeofday(&time,NULL);
         elapsedTime = time.tv_sec + time.tv_usec*1000000L - currentTime;
 
-        usleep((unsigned int)fabs((newPacket->interArrivalTime)*1000000L - elapsedTime/1000000L));
+        long int sleeptime = ((newPacket->interArrivalTime)*1000L - elapsedTime/1000000L);
+        
+        usleep((sleeptime<0)?0:(unsigned int)sleeptime);
         
         gettimeofday(&time,NULL);
         currentTime = time.tv_sec + time.tv_usec*1000000L;
@@ -297,14 +301,13 @@ void *packetArrivalMethod(void *args)
             My402ListAppend(&Q1,(void*)newPacket);
             pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
             
-            packet *dequePacket = (packet*)My402ListFirst(&Q1)->obj;
 
             
-            if (dequePacket->tokensNeeded <= tokenBucket.num_members) {
+            if (newPacket->tokensNeeded <= tokenBucket.num_members) {
                 
                 
                 int i = 0;
-                while (i < dequePacket->tokensNeeded) {
+                while (i < newPacket->tokensNeeded) {
                     My402ListUnlink(&tokenBucket,My402ListFirst(&tokenBucket));
                     i++;
                 }
@@ -312,7 +315,7 @@ void *packetArrivalMethod(void *args)
                 
                 struct timeval temp;
                 gettimeofday(&temp, NULL);
-                printf("\n p%d leaves Q1, time in Q1 = %ld, token bucket now has %d token",dequePacket->ID,(temp.tv_sec + temp.tv_usec*1000000L) - (dequePacket->Q1EnterTime.tv_sec + dequePacket->Q1EnterTime.tv_usec*1000000L),Q1.num_members);
+                printf("\n p%d leaves Q1, time in Q1 = %ld, token bucket now has %d token",newPacket->ID,(temp.tv_sec + temp.tv_usec*1000000L) - (newPacket->Q1EnterTime.tv_sec + newPacket->Q1EnterTime.tv_usec*1000000L),Q1.num_members);
                 
                 pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
                 My402ListUnlink(&Q1, My402ListFirst(&Q1));
@@ -322,7 +325,7 @@ void *packetArrivalMethod(void *args)
                 printf("\n packet%d enters Q2",newPacket->ID);
                 
                 pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
-                My402ListAppend(&Q2,(packet*)dequePacket);
+                My402ListAppend(&Q2,(packet*)newPacket);
                 pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
 
 
@@ -350,7 +353,9 @@ void *tokenArrivalMethod(void *args)
 
     while (packetsServed < num || !serveInterrupt) {
         
-        usleep((unsigned int)fabs((1/r)*1000000L -elapsedTime/1000000L));
+        long int sleeptime = ((1/r)*1000000L -elapsedTime/1000000L);
+        
+        usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
 
         gettimeofday(&time,NULL);
         currentTime = time.tv_sec + time.tv_usec*1000000L;
@@ -452,7 +457,9 @@ void *serverMethod(void *args)
      
 	printf("my sleep time is %lf",dequePacket->serviceTime);
 
-        usleep((unsigned int)fabs((dequePacket->serviceTime)*1000000L - elapsedTime/1000000L));
+        long int sleeptime = (dequePacket->serviceTime)*1000L - elapsedTime/1000000L;;
+
+        usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
 
         gettimeofday(&dequePacket->serviceEndTime,NULL);
         currentTime = dequePacket->serviceEndTime.tv_sec + dequePacket->serviceEndTime.tv_usec*1000000L;
@@ -510,7 +517,10 @@ void *server2Method(void *args)
         
         printf("\n p%d begins service at S2, requesting %dms of service",dequePacket->ID,100);
         
-        usleep((unsigned int)fabs((dequePacket->serviceTime)*1000000L - elapsedTime/1000000L));
+        long int sleeptime = (dequePacket->serviceTime)*1000L - elapsedTime/1000000L;
+        
+        usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
+
         
         gettimeofday(&dequePacket->serviceEndTime,NULL);
         currentTime = dequePacket->serviceEndTime.tv_sec + dequePacket->serviceEndTime.tv_usec*1000000L;
