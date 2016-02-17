@@ -310,7 +310,9 @@ void *packetArrivalMethod(void *args)
                 
                 int i = 0;
                 while (i < newPacket->tokensNeeded) {
+                    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
                     My402ListUnlink(&tokenBucket,My402ListFirst(&tokenBucket));
+                    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
                     i++;
                 }
                 
@@ -365,9 +367,11 @@ void *tokenArrivalMethod(void *args)
         pthread_mutex_lock(&Q1Mutex); 
         {
 
-            if (tokenBucket.num_members <= 100) {
+            if (tokenBucket.num_members <= b) {
                 int *token = (int*)malloc(sizeof(int));
+                pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
                 My402ListAppend(&tokenBucket,token);
+                pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
             }
             
             if (!My402ListEmpty(&Q1)) {
@@ -379,11 +383,13 @@ void *tokenArrivalMethod(void *args)
                 
                 
                     int i = 0;
+                    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
                     while (i < dequePacket->tokensNeeded) {
                         My402ListUnlink(&tokenBucket,My402ListFirst(&tokenBucket));
                         i++;
                     }
-                    
+                    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
+
                     struct timeval temp;
                     gettimeofday(&temp, NULL);
                     
@@ -447,7 +453,10 @@ void *serverMethod(void *args)
         struct timeval temp;
         gettimeofday(&temp, NULL);
         
+        pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
         My402ListUnlink(&Q2,My402ListFirst(&Q2));
+        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
+
 
         printf("\n p%d leaves Q2, time in Q2 = %ld",dequePacket->ID,(temp.tv_sec + temp.tv_usec*1000000L) - (dequePacket->Q2EnterTime.tv_sec + dequePacket->Q2EnterTime.tv_usec*1000000L));
         
@@ -509,7 +518,10 @@ void *server2Method(void *args)
         struct timeval temp;
         gettimeofday(&temp, NULL);
         
+        pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
         My402ListUnlink(&Q2,My402ListFirst(&Q2));
+        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
+
         
         printf("\n p%d leaves Q2, time in Q2 = %ld",dequePacket->ID,(temp.tv_sec + temp.tv_usec*1000000L) - (dequePacket->Q2EnterTime.tv_sec + dequePacket->Q2EnterTime.tv_usec*1000000L));
         
