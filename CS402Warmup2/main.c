@@ -228,7 +228,7 @@ int main(int argc, const char * argv[]) {
         }
     }
     
-    printf("number to arrive = %ld\n",num);
+    printf("\t\tnumber to arrive = %ld\n",num);
     if (!isTraceFileMode) {
         printf("\t\tlambda = %f\n",lambda);
         printf("\t\tmu = %f\n",mu);
