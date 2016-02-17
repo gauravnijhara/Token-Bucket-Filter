@@ -511,7 +511,7 @@ void *serverMethod(void *args)
 
         printf("%012.3lfms : p%d begins service at S1, requesting %dms of service\n",mainTimeLine,dequePacket->ID,100);
      
-	//printf("my sleep time is %lf",dequePacket->serviceTime);
+        printf("my sleep time is %lf , elapsed time is %lld",dequePacket->serviceTime,elapsedTime);
 
         long int sleeptime = (dequePacket->serviceTime) - elapsedTime;
 
@@ -583,6 +583,8 @@ void *server2Method(void *args)
 
         printf("%012.3lfms : p%d begins service at S2, requesting %dms of service\n",mainTimeLine,dequePacket->ID,100);
         
+        printf("my sleep time is %lf , elapsed time is %lld",dequePacket->serviceTime,elapsedTime);
+
         long int sleeptime = (dequePacket->serviceTime) - elapsedTime;
         
         printf("\n------%d server 2 ------\n",(unsigned int)sleeptime);
