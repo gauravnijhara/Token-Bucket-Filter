@@ -282,9 +282,9 @@ void *packetArrivalMethod(void *args)
                 
             }
         }else {
-            newPacket->interArrivalTime = (1/lambda);
+            newPacket->interArrivalTime = (1/lambda)*1000000;
             newPacket->tokensNeeded = p;
-            newPacket->serviceTime = (1/mu);
+            newPacket->serviceTime = (1/mu)*1000000;
             
         }
         newPacket->ID = ++packetCount;
@@ -293,6 +293,8 @@ void *packetArrivalMethod(void *args)
         elapsedTime = time.tv_sec*1000000 + time.tv_usec - currentTime;
 
         long int sleeptime = ((newPacket->interArrivalTime) - elapsedTime);
+        
+        printf("\n sleeptime %ld \n",sleeptime);
         
      //   printf("\n------%d------\n",(unsigned int)sleeptime);
         usleep((sleeptime<0)?0:(unsigned int)sleeptime);
@@ -474,7 +476,6 @@ void *serverMethod(void *args)
         
         pthread_mutex_lock(&Q1Mutex); 
         
-
         while (My402ListEmpty(&Q2) && packetsServed != num && !serveInterrupt) {
             pthread_cond_wait(&serverQ, &Q1Mutex);
         }
