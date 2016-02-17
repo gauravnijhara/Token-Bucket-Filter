@@ -529,7 +529,7 @@ void *serverMethod(void *args)
         }
        
     }
-		printf("\n server 1 thread exit \n");
+		//printf("\n server 1 thread exit \n");
     pthread_exit(0);
 }
 
