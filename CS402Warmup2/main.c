@@ -712,7 +712,6 @@ void printStats()
     printf("average number of packets in Q2 = %.6Lg\n",(totalTimeInQ2/mainTimeLine));
     printf("average number of packets in S1 = %.6Lg\n",(totalTimeInS1/mainTimeLine));
     printf("average number of packets in S2 = %.6Lg\n",(totalTimeInS2/mainTimeLine));
-    printf("average number of packets in S2 = %.6Lg\n",(totalTimeInS2/mainTimeLine));
     
     if (!(packetCount-droppedPackets)) {
         printf("\naverage time a packet spent in system = All packets dropped or no packets in system");
