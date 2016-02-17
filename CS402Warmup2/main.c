@@ -58,7 +58,7 @@ void handleQuit(int signal);
 
 int main(int argc, const char * argv[]) {
     
-    printf("Emulation Parameters:\n");
+    printf("\n\nEmulation Parameters:\n");
     
     int i;
     for (i = 1; i < argc; i++) {
@@ -210,18 +210,19 @@ int main(int argc, const char * argv[]) {
 //    tsfile = FILENAME
     printf("number to arrive = %ld\n",num);
     if (!isTraceFileMode) {
-        printf("lambda = %f\n",lambda);
-        printf("mu = %f\n",mu);
+        printf("\t\tlambda = %f\n",lambda);
+        printf("\t\tmu = %f\n",mu);
     }
-    printf("r = %f\n",r);
-    printf("B = %f\n",b);
+    printf("\t\tr = %f\n",r);
+    printf("\t\tB = %f\n",b);
     if (!isTraceFileMode) {
-        printf("P = %f\n",p);
+        printf("\t\tP = %f\n",p);
     }else {
-        printf("tsfile = %s\n",fileName);
+        printf("\t\ttsfile = %s\n",fileName);
     }
 
-    printf("%8.3lfms : Emulation Begins",mainTimeLine);
+    mainTimeLine = 0.0;
+    printf("%8.3lfms : Emulation Begins\n\n",mainTimeLine);
     sigemptyset(&quitSignal);
     sigaddset(&quitSignal, SIGINT);
     pthread_sigmask(SIG_BLOCK, &quitSignal, NULL);
@@ -240,7 +241,7 @@ int main(int argc, const char * argv[]) {
     allThreadsKilled = 1;
     pthread_join(signalQuitThread,NULL);
     
-    printf("%8.3lfms : Emulation ends\n",mainTimeLine);
+    printf("%8.3lfms : Emulation ends\n\n\n",mainTimeLine);
     pthread_exit(0);
 }
 
