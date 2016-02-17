@@ -729,18 +729,19 @@ void printStats()
         printf("standard deviation for time spent in system = %.6Lg\n",sqrtl((squareOfSystemTime/(packetCount-droppedTokens))-((totalTimeSpentInSystem/(packetCount-droppedPackets))*(totalTimeSpentInSystem/(packetCount-droppedPackets)))));
     }
     
-    printf("dropped tokens : %d , tokencount : %d , packetcount : %d, dropped packets : %d\n",droppedTokens,totalTokenGenerated,packetCount,droppedPackets);
     
     if (!totalTokenGenerated) {
         printf("\ntoken drop probability = No tokens generated");
     }else {
-        printf("\ntoken drop probability = %f\n",(float)(droppedTokens/(totalTokenGenerated)));
+        float num = droppedTokens/totalTokenGenerated;
+        printf("\ntoken drop probability = %f\n",num);
     }
     
     if (!packetCount) {
         printf("packet drop probability = No packets in system ");
     }else {
-        printf("packet drop probability = %f\n",(float)(droppedPackets/(packetCount)));
+        float num = droppedPackets/packetCount;
+        printf("packet drop probability = %f\n",num);
     }
     
     
