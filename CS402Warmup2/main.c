@@ -257,7 +257,7 @@ void *packetArrivalMethod(void *args)
     // create first packet
     while (packetCount < num) {
         
-        packet *newPacket = (packet*)malloc(sizeof(packet));
+        packet *newPacket = malloc(sizeof(packet));
         
         if (isTraceFileMode) {
             char buffer[1026];
@@ -410,9 +410,9 @@ void *tokenArrivalMethod(void *args)
 
             pthread_cleanup_push(handleCleanUp, 0);
             if (tokenBucket.num_members <= b) {
-                int *token = (int*)malloc(sizeof(int));
+                //int *token = (int*)malloc(sizeof(int));
                 pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
-                My402ListAppend(&tokenBucket,token);
+                My402ListAppend(&tokenBucket,NULL);
                 pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
             }
             
