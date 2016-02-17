@@ -700,17 +700,17 @@ void printStats()
 {
     printf("\n\n Statistics: \n\n");
     
-    printf("\naverage packet inter arrival time = %LF\n",(totalInterArrivalTime/packetCount));
+    printf("\naverage packet inter arrival time = %.6LgLF\n",(totalInterArrivalTime/packetCount));
     printf("average packet service time = %LF\n",((totalTimeInS1+totalTimeInS2)/(packetCount-droppedPackets)));
 
-    printf("\naverage number of packets in Q1 = %Lf\n",(totalTimeInQ1/mainTimeLine));
-    printf("average number of packets in Q2 = %Lf\n",(totalTimeInQ2/mainTimeLine));
-    printf("average number of packets in S1 = %Lf\n",(totalTimeInS1/mainTimeLine));
-    printf("average number of packets in S2 = %Lf\n",(totalTimeInS2/mainTimeLine));
-    printf("average number of packets in S2 = %Lf\n",(totalTimeInS2/mainTimeLine));
+    printf("\naverage number of packets in Q1 = %.6LgLf\n",(totalTimeInQ1/mainTimeLine));
+    printf("average number of packets in Q2 = %.6Lgf\n",(totalTimeInQ2/mainTimeLine));
+    printf("average number of packets in S1 = %.6Lgf\n",(totalTimeInS1/mainTimeLine));
+    printf("average number of packets in S2 = %.6Lgf\n",(totalTimeInS2/mainTimeLine));
+    printf("average number of packets in S2 = %.6Lgf\n",(totalTimeInS2/mainTimeLine));
     
-    printf("\naverage time a packet spent in system = %LF\n",(totalTimeSpentInSystem/(packetCount-droppedPackets)));
-    printf("standard deviation for time spent in system = %LF\n",sqrtl((squareOfSystemTime/(packetCount-droppedTokens))-((totalTimeSpentInSystem/(packetCount-droppedPackets))*(totalTimeSpentInSystem/(packetCount-droppedPackets)))));
+    printf("\naverage time a packet spent in system = %.6LgF\n",(totalTimeSpentInSystem/(packetCount-droppedPackets)));
+    printf("standard deviation for time spent in system = %.6LgF\n",sqrtl((squareOfSystemTime/(packetCount-droppedTokens))-((totalTimeSpentInSystem/(packetCount-droppedPackets))*(totalTimeSpentInSystem/(packetCount-droppedPackets)))));
     
     printf("\ntoken drop probability = %u\n",(droppedTokens/(totalTokenGenerated)));
     printf("packet drop probability = %u\n",(droppedPackets/(packetCount)));
