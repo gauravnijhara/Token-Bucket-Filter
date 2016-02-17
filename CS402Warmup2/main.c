@@ -507,7 +507,7 @@ void *serverMethod(void *args)
         gettimeofday(&dequePacket->serviceStartTime,NULL);
         elapsedTime = dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec - currentTime;
 
-        printf("my service start time is %ld , elapsed time is %lld , currenttime %lld",(dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec),elapsedTime,currentTime);
+        printf("my service start time is %ld , elapsed time is %lld , currenttime %lld\n",(dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec),elapsedTime,currentTime);
 
         mainTimeLine = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec + timeOffset)/1000;
 
@@ -580,7 +580,7 @@ void *server2Method(void *args)
         gettimeofday(&dequePacket->serviceStartTime,NULL);
         elapsedTime = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec) - currentTime;
         
-        printf("my service start time is %ld , elapsed time is %lld , currenttime %lld",(dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec),elapsedTime,currentTime);
+        printf("my service start time is %ld , elapsed time is %lld , currenttime %lld\n",(dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec),elapsedTime,currentTime);
 
         mainTimeLine = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec + timeOffset)/1000;
 
