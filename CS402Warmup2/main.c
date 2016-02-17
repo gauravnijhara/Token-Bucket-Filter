@@ -74,7 +74,7 @@ void printStats();
 
 int main(int argc, const char * argv[]) {
     
-    printf("\n\nEmulation Parameters:");
+    printf("\n\nEmulation Parameters:\n");
     
     int i;
     for (i = 1; i < argc; i++) {
@@ -248,7 +248,7 @@ int main(int argc, const char * argv[]) {
     
     pthread_create(&signalQuitThread, NULL,handleQuitGracefully, NULL);
 
-    printf("%012.3lfms : Emulation Begins\n\n",000000000.000);
+    printf("\n%012.3lfms : Emulation Begins\n",000000000.000);
     sigemptyset(&quitSignal);
     sigaddset(&quitSignal, SIGINT);
     pthread_sigmask(SIG_BLOCK, &quitSignal, NULL);
