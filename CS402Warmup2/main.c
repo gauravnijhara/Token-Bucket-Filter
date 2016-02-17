@@ -516,7 +516,7 @@ void *serverMethod(void *args)
 
 	//printf("packets : %d , num : %ld",packetsServed,num);
 
-        printf("%8.3lfms : p% departs from S1, service time = %lldms , time in system = %ldms\n",mainTimeLine,dequePacket->ID,(currentTime - (dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000)),(dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000000L) - (dequePacket->serviceEndTime.tv_sec + dequePacket->serviceEndTime.tv_usec*1000000L));
+        printf("%8.3lfms : p%d departs from S1, service time = %lldms , time in system = %ldms\n",mainTimeLine,dequePacket->ID,(currentTime - (dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000)),(dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000000L) - (dequePacket->serviceEndTime.tv_sec + dequePacket->serviceEndTime.tv_usec*1000000L));
         
 
         if (packetsServed == num || serveInterrupt) {
@@ -585,7 +585,7 @@ void *server2Method(void *args)
 
             mainTimeLine = dequePacket->serviceStartTime.tv_sec*1000 + dequePacket->serviceStartTime.tv_usec/1000 + timeOffset;
 
-           printf("%8.3lfms : p% departs from S2, service time = %lldms , time in system = %ldms\n",mainTimeLine,dequePacket->ID,(currentTime - (dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000)),(dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000000L) - (dequePacket->serviceEndTime.tv_sec + dequePacket->serviceEndTime.tv_usec*1000000L));
+           printf("%8.3lfms : p%d eparts from S2, service time = %lldms , time in system = %ldms\n",mainTimeLine,dequePacket->ID,(currentTime - (dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000)),(dequePacket->serviceStartTime.tv_sec + dequePacket->serviceStartTime.tv_usec*1000000L) - (dequePacket->serviceEndTime.tv_sec + dequePacket->serviceEndTime.tv_usec*1000000L));
 
 
         if (packetsServed == num || serveInterrupt) {
