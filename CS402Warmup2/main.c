@@ -438,11 +438,14 @@ void *tokenArrivalMethod(void *args)
                     gettimeofday(&temp, NULL);
                     mainTimeLine = (temp.tv_sec*1000000 + temp.tv_usec + timeOffset)/1000;
 
-                    printf("%012.3lfms : packet%d enters Q2\n",mainTimeLine,dequePacket->ID);
                 
                     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
                     My402ListAppend(&Q2,(packet*)dequePacket);
                     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
+
+                    gettimeofday(&dequePacket->Q2EnterTime, NULL);
+                    mainTimeLine = (dequePacket->Q2EnterTime.tv_sec*1000000 + dequePacket->Q2EnterTime.tv_usec + timeOffset)/1000;
+                    printf("%012.3lfms : packet%d enters Q2\n",mainTimeLine,dequePacket->ID);
 
                 }
             
