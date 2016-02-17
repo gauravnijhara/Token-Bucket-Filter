@@ -475,7 +475,7 @@ void *tokenArrivalMethod(void *args)
 
 void *serverMethod(void *args)
 {
-    long long currentTime = 0,elapsedTime;
+    long long currentTime = 0,elapsedTime = 0;
 
     while (1) {
         
@@ -549,7 +549,7 @@ void *serverMethod(void *args)
 
 void *server2Method(void *args)
 {
-    long long currentTime = 0,elapsedTime;
+    long long currentTime = 0,elapsedTime = 0;
     
     while (1) {
         
