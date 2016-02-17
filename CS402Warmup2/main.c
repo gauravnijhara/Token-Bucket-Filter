@@ -684,9 +684,6 @@ void handleQuit(int signal)
     
     pthread_mutex_lock(&Q1Mutex); 
     
-    for (int i = 0; i < Q1.num_members; i++) {
-        
-    }
     printf("errors here");
     // traverse Q1 and Q2 to prompt delete
   //  My402ListUnlinkAll(&Q1);
@@ -700,8 +697,17 @@ void printStats()
 {
     printf("\n\n Statistics: \n\n");
     
-    printf("\naverage packet inter arrival time = %.6LgLF\n",(totalInterArrivalTime/packetCount));
-    printf("average packet service time = %LF\n",((totalTimeInS1+totalTimeInS2)/(packetCount-droppedPackets)));
+    if (!packetCount) {
+        printf("\naverage packet inter arrival time = No packets in system");
+    }else {
+        printf("\naverage packet inter arrival time = %.6LgLF\n",(totalInterArrivalTime/packetCount));
+    }
+    
+    if (!(packetCount-droppedPackets)) {
+        printf("average packet service time = All packets dropped or no packets in system");
+    }else {
+        printf("average packet service time = %LF\n",((totalTimeInS1+totalTimeInS2)/(packetCount-droppedPackets)));
+    }
 
     printf("\naverage number of packets in Q1 = %.6LgLf\n",(totalTimeInQ1/mainTimeLine));
     printf("average number of packets in Q2 = %.6Lgf\n",(totalTimeInQ2/mainTimeLine));
@@ -709,12 +715,32 @@ void printStats()
     printf("average number of packets in S2 = %.6Lgf\n",(totalTimeInS2/mainTimeLine));
     printf("average number of packets in S2 = %.6Lgf\n",(totalTimeInS2/mainTimeLine));
     
-    printf("\naverage time a packet spent in system = %.6LgF\n",(totalTimeSpentInSystem/(packetCount-droppedPackets)));
-    printf("standard deviation for time spent in system = %.6LgF\n",sqrtl((squareOfSystemTime/(packetCount-droppedTokens))-((totalTimeSpentInSystem/(packetCount-droppedPackets))*(totalTimeSpentInSystem/(packetCount-droppedPackets)))));
+    if (!(packetCount-droppedPackets)) {
+        printf("\naverage time a packet spent in system = All packets dropped or no packets in system");
+    }else {
+        printf("\naverage time a packet spent in system = %.6LgF\n",(totalTimeSpentInSystem/(packetCount-droppedPackets)));
+    }
     
-    printf("\ntoken drop probability = %u\n",(droppedTokens/(totalTokenGenerated)));
-    printf("packet drop probability = %u\n",(droppedPackets/(packetCount)));
+    
+    if (!(packetCount-droppedPackets)) {
+        printf("standard deviation for time spent in system = All packets dropped or no packets in system");
 
+    }
+    else {
+        printf("standard deviation for time spent in system = %.6LgF\n",sqrtl((squareOfSystemTime/(packetCount-droppedTokens))-((totalTimeSpentInSystem/(packetCount-droppedPackets))*(totalTimeSpentInSystem/(packetCount-droppedPackets)))));
+    }
+    
+    if (!totalTokenGenerated) {
+        printf("\ntoken drop probability = No tokens generated");
+    }else {
+        printf("\ntoken drop probability = %u\n",(droppedTokens/(totalTokenGenerated)));
+    }
+    
+    if (!packetCount) {
+        printf("packet drop probability = No packets in system ");
+    }else {
+        printf("packet drop probability = %u\n",(droppedPackets/(packetCount)));
+    }
     
     
 }
