@@ -749,7 +749,7 @@ void printStats()
 
     }
     else {
-        printf("\t\tstandard deviation for time spent in system = %.6g\n",sqrt((squareOfSystemTime/(packetCount-droppedTokens))- (((totalTimeSpentInSystem/(packetCount-droppedPackets))*(totalTimeSpentInSystem/(packetCount-droppedPackets)))))/1000);
+        printf("\t\tstandard deviation for time spent in system = %.6g\n",sqrt((squareOfSystemTime/(packetsServed-droppedTokens))- (((totalTimeSpentInSystem/(packetsServed-droppedPackets))*(totalTimeSpentInSystem/(packetCount-droppedPackets)))))/1000);
     }
     
     
