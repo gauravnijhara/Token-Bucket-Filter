@@ -305,22 +305,22 @@ void *packetArrivalMethod(void *args)
         
         
         // packetCount
-        printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms \n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/1000);
         
+        if (newPacket->tokensNeeded > b) {
+            packetsServed++;
+            printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms , dropped \n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/1000);
+
+        }else {
+            printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms \n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/1000);
+
+        }
+
         prevTokenArrivalTime = currentTime;
 
         newPacket->systemTimeOnEnter = time;
         
         pthread_mutex_lock(&Q1Mutex);
         {
-            
-            if (newPacket->tokensNeeded > b) {
-                packetsServed++;
-                gettimeofday(&time,NULL);
-                elapsedTime = time.tv_sec*1000000 + time.tv_usec - currentTime;
-                pthread_mutex_unlock(&Q1Mutex); 
-                continue;
-            }
             
             
             gettimeofday(&newPacket->Q1EnterTime, NULL);
