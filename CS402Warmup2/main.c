@@ -49,7 +49,7 @@ double totalTimeInS2 = 0;
 double totalTimeSpentInSystem = 0;
 double totalInterArrivalTime = 0;
 double totalServiceTime = 0;
-double squareOfSystemTime = 0;
+long double squareOfSystemTime = 0;
 
 typedef struct packet
 {
@@ -74,7 +74,7 @@ void printStats();
 
 int main(int argc, const char * argv[]) {
     
-    printf("\n\nEmulation Parameters:\n");
+    printf("\n\nEmulation Parameters:");
     
     int i;
     for (i = 1; i < argc; i++) {
@@ -697,7 +697,7 @@ void handleCleanUp()
 
 void handleQuit(int signal)
 {
-    printf("calling handler");
+    //printf("calling handler");
     pthread_cancel(tokenThread);
     pthread_cancel(packetThread);
     
@@ -707,7 +707,7 @@ void handleQuit(int signal)
     
     pthread_mutex_lock(&Q1Mutex); 
     
-    printf("errors here");
+    //printf("errors here");
     // traverse Q1 and Q2 to prompt delete
   //  My402ListUnlinkAll(&Q1);
   //  My402ListUnlinkAll(&Q2);
@@ -749,7 +749,7 @@ void printStats()
 
     }
     else {
-        printf("standard deviation for time spent in system = %.6g\n",sqrt((squareOfSystemTime/(packetCount-droppedTokens))-((totalTimeSpentInSystem/(packetCount-droppedPackets))*(totalTimeSpentInSystem/(packetCount-droppedPackets)))));
+        printf("standard deviation for time spent in system = %.6g\n",sqrt((squareOfSystemTime/(packetCount-droppedTokens))- (((totalTimeSpentInSystem/(packetCount-droppedPackets))*(totalTimeSpentInSystem/(packetCount-droppedPackets))))));
     }
     
     
