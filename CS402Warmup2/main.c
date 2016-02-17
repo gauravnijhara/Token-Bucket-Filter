@@ -590,7 +590,7 @@ void *server2Method(void *args)
 
         mainTimeLine = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec + timeOffset)/1000;
 
-        printf("%012.3lfms : p%d begins service at S2, requesting %dms of service\n",mainTimeLine,dequePacket->ID,dequePacket->serviceTime/100);
+        printf("%012.3lfms : p%d begins service at S2, requesting %fms of service\n",mainTimeLine,dequePacket->ID,dequePacket->serviceTime/100);
         
 
         long int sleeptime = (dequePacket->serviceTime) - elapsedTime;
