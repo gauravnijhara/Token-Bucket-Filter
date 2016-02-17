@@ -507,11 +507,12 @@ void *serverMethod(void *args)
         gettimeofday(&dequePacket->serviceStartTime,NULL);
         elapsedTime = dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec - currentTime;
 
+        printf("my service start time is %ld , elapsed time is %lld , currenttime %lld",(dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec),elapsedTime,currentTime);
+
         mainTimeLine = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec + timeOffset)/1000;
 
         printf("%012.3lfms : p%d begins service at S1, requesting %dms of service\n",mainTimeLine,dequePacket->ID,100);
      
-        printf("my sleep time is %lf , elapsed time is %lld",dequePacket->serviceTime,elapsedTime);
 
         long int sleeptime = (dequePacket->serviceTime) - elapsedTime;
 
@@ -577,13 +578,14 @@ void *server2Method(void *args)
         pthread_mutex_unlock(&Q1Mutex); 
         
         gettimeofday(&dequePacket->serviceStartTime,NULL);
-        elapsedTime = dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec - currentTime;
+        elapsedTime = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec) - currentTime;
         
+        printf("my service start time is %ld , elapsed time is %lld , currenttime %lld",(dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec),elapsedTime,currentTime);
+
         mainTimeLine = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec + timeOffset)/1000;
 
         printf("%012.3lfms : p%d begins service at S2, requesting %dms of service\n",mainTimeLine,dequePacket->ID,100);
         
-        printf("my sleep time is %lf , elapsed time is %lld",dequePacket->serviceTime,elapsedTime);
 
         long int sleeptime = (dequePacket->serviceTime) - elapsedTime;
         
