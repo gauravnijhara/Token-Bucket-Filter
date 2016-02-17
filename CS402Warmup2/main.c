@@ -383,7 +383,6 @@ void *packetArrivalMethod(void *args)
 
                 totalTimeInQ1 += ((double)((temp.tv_sec*1000000 + temp.tv_usec) - (newPacket->Q1EnterTime.tv_sec*1000000 + newPacket->Q1EnterTime.tv_usec)))/1000;
             
-                printf("total time in Q1 is %f",totalTimeInQ1);
 
                 
                 pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
@@ -471,6 +470,8 @@ void *tokenArrivalMethod(void *args)
                 
                     printf("%012.3lfms : p%d leaves Q1, time in Q1 = %08.3lfms, token bucket now has %d token\n",mainTimeLine,dequePacket->ID,((double)((temp.tv_sec*1000000 + temp.tv_usec) - (dequePacket->Q1EnterTime.tv_sec*1000000 + dequePacket->Q1EnterTime.tv_usec)))/1000,Q1.num_members);
                 
+                    totalTimeInQ1 += ((double)((temp.tv_sec*1000000 + temp.tv_usec) - (dequePacket->Q1EnterTime.tv_sec*1000000 + dequePacket->Q1EnterTime.tv_usec)))/1000;
+
                     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
                     My402ListUnlink(&Q1, My402ListFirst(&Q1));
                     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
