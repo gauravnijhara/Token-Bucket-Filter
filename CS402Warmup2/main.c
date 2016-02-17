@@ -349,19 +349,21 @@ void *packetArrivalMethod(void *args)
                 gettimeofday(&temp, NULL);
                 mainTimeLine = (temp.tv_sec*1000000 + temp.tv_usec + timeOffset)/1000;
                 
-                printf("%012.3lfms : p%d leaves Q1, time in Q1 = %08.3lfms, token bucket now has %d token\n",mainTimeLine,newPacket->ID,((double)((temp.tv_sec*1000000 + temp.tv_usec) - (newPacket->Q1EnterTime.tv_sec*1000000 + newPacket->Q1EnterTime.tv_usec)))/1000,Q1.num_members);
-                
                 pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
                 My402ListUnlink(&Q1, My402ListFirst(&Q1));
                 pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
 
-                gettimeofday(&newPacket->Q2EnterTime, NULL);
-                mainTimeLine = (newPacket->Q2EnterTime.tv_sec*1000000 + newPacket->Q2EnterTime.tv_usec + timeOffset)/1000;
-                printf("%012.3lfms : packet%d enters Q2\n",mainTimeLine,newPacket->ID);
+                printf("%012.3lfms : p%d leaves Q1, time in Q1 = %08.3lfms, token bucket now has %d token\n",mainTimeLine,newPacket->ID,((double)((temp.tv_sec*1000000 + temp.tv_usec) - (newPacket->Q1EnterTime.tv_sec*1000000 + newPacket->Q1EnterTime.tv_usec)))/1000,Q1.num_members);
+
                 
                 pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
                 My402ListAppend(&Q2,(packet*)newPacket);
                 pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
+                
+                gettimeofday(&newPacket->Q2EnterTime, NULL);
+                mainTimeLine = (newPacket->Q2EnterTime.tv_sec*1000000 + newPacket->Q2EnterTime.tv_usec + timeOffset)/1000;
+                printf("%012.3lfms : packet%d enters Q2\n",mainTimeLine,newPacket->ID);
+
 
 
             }
@@ -427,7 +429,7 @@ void *tokenArrivalMethod(void *args)
                     gettimeofday(&temp, NULL);
                     mainTimeLine = (temp.tv_sec*1000000 + temp.tv_usec + timeOffset)/1000;
                 
-                    printf("%012.3lfms : p%d leaves Q1, time in Q1 = %08.3lf, token bucket now has %d token\n",mainTimeLine,dequePacket->ID,((double)((temp.tv_sec*1000000 + temp.tv_usec) - (dequePacket->Q1EnterTime.tv_sec*1000000 + dequePacket->Q1EnterTime.tv_usec)))/1000,Q1.num_members);
+                    printf("%012.3lfms : p%d leaves Q1, time in Q1 = %08.3lfms, token bucket now has %d token\n",mainTimeLine,dequePacket->ID,((double)((temp.tv_sec*1000000 + temp.tv_usec) - (dequePacket->Q1EnterTime.tv_sec*1000000 + dequePacket->Q1EnterTime.tv_usec)))/1000,Q1.num_members);
                 
                     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
                     My402ListUnlink(&Q1, My402ListFirst(&Q1));
@@ -486,17 +488,17 @@ void *serverMethod(void *args)
         }
 
         packet *dequePacket = (packet*)My402ListFirst(&Q2)->obj;
-        struct timeval temp;
-        gettimeofday(&temp, NULL);
+        
         
         pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
         My402ListUnlink(&Q2,My402ListFirst(&Q2));
         pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
         
+        struct timeval temp;
         gettimeofday(&temp, NULL);
         mainTimeLine = (temp.tv_sec*1000000 + temp.tv_usec + timeOffset)/1000;
 
-        printf("%012.3lfms : p%d leaves Q2, time in Q2 = %08.3lf\n",mainTimeLine,dequePacket->ID,((double)((temp.tv_sec*1000000 + temp.tv_usec) - (dequePacket->Q2EnterTime.tv_sec*1000000 + dequePacket->Q2EnterTime.tv_usec)))/1000);
+        printf("%012.3lfms : p%d leaves Q2, time in Q2 = %08.3lfms\n",mainTimeLine,dequePacket->ID,((double)((temp.tv_sec*1000000 + temp.tv_usec) - (dequePacket->Q2EnterTime.tv_sec*1000000 + dequePacket->Q2EnterTime.tv_usec)))/1000);
         
         packetsServed++;
         
@@ -522,11 +524,10 @@ void *serverMethod(void *args)
         
         mainTimeLine = (dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec + timeOffset)/1000;
 
-	//printf("packets : %d , num : %ld",packetsServed,num);
+        //printf("packets : %d , num : %ld",packetsServed,num);
 
         printf("%012.3lfms : p%d departs from S1, service time = %08.3lfms , time in system = %08.3lfms\n",mainTimeLine,dequePacket->ID,((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec)))/1000,((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->Q1EnterTime.tv_sec*1000000 + dequePacket->Q1EnterTime.tv_usec)))/1000);
         
-
         if (packetsServed == num || serveInterrupt) {
             if (packetsServed == num) {
                 pthread_mutex_lock(&Q1Mutex); 
@@ -559,16 +560,17 @@ void *server2Method(void *args)
         }
 
         packet *dequePacket = (packet*)My402ListFirst(&Q2)->obj;
-        struct timeval temp;
-        gettimeofday(&temp, NULL);
         
         pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
         My402ListUnlink(&Q2,My402ListFirst(&Q2));
         pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
 
+        struct timeval temp;
+        gettimeofday(&temp, NULL);
+        
         mainTimeLine = (temp.tv_sec*1000000 + temp.tv_usec + timeOffset)/1000;
 
-        printf("%012.3lfms : p%d leaves Q2, time in Q2 = %08.3lf\n",mainTimeLine,dequePacket->ID,((double)(temp.tv_sec*1000000 + temp.tv_usec) - (dequePacket->Q2EnterTime.tv_sec*1000000 + dequePacket->Q2EnterTime.tv_usec))/1000);
+        printf("%012.3lfms : p%d leaves Q2, time in Q2 = %08.3lfms\n",mainTimeLine,dequePacket->ID,((double)(temp.tv_sec*1000000 + temp.tv_usec) - (dequePacket->Q2EnterTime.tv_sec*1000000 + dequePacket->Q2EnterTime.tv_usec))/1000);
         
         packetsServed++;
         
@@ -593,7 +595,7 @@ void *server2Method(void *args)
         
 	//printf("packets : %d , num : %ld",packetsServed,num);
 
-            mainTimeLine = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec + timeOffset);
+            mainTimeLine = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec + timeOffset)/1000;
 
            printf("%012.3lfms : p%d departs from S2, service time = %08.3lfms , time in system = %08.3lfms\n",mainTimeLine,dequePacket->ID,((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec)))/1000,((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->Q1EnterTime.tv_sec*1000000 + dequePacket->Q1EnterTime.tv_usec)))/1000);
 
