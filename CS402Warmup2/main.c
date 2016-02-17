@@ -58,8 +58,6 @@ int main(int argc, const char * argv[]) {
     
     printf("Emulation Parameters:\n");
     int i;
-    argc = 2;
-    argv[1] = "-t";
     for (i = 1; i < argc; i++) {
         
         if (strcmp(argv[i],"-lambda") == 0) {
@@ -141,7 +139,7 @@ int main(int argc, const char * argv[]) {
                 isTraceFileMode = 1;
                 
                 struct stat fileCheck;
-                                
+                
                 if( stat(fileName,&fileCheck) == 0 )
                 {
                     if( fileCheck.st_mode & S_IFREG )
