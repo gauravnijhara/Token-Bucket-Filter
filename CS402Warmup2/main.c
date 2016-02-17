@@ -325,7 +325,8 @@ void *packetArrivalMethod(void *args)
         pthread_mutex_lock(&Q1Mutex);
         {
             
-            
+            pthread_cleanup_push(handleCleanUp, 0);
+
             gettimeofday(&newPacket->Q1EnterTime, NULL);
             mainTimeLine = (newPacket->Q1EnterTime.tv_sec*1000000 + newPacket->Q1EnterTime.tv_usec + timeOffset)/1000;
             printf("%012.3lfms : packet%d enters Q1\n",mainTimeLine,newPacket->ID);
@@ -370,13 +371,17 @@ void *packetArrivalMethod(void *args)
 
 
             }
+            
+            if (!My402ListEmpty(&Q2)) {
+                pthread_cond_broadcast(&serverQ);
+            }
+            
+            pthread_mutex_unlock(&Q1Mutex);
+
+            pthread_cleanup_pop(0);
+
         }
         
-        if (!My402ListEmpty(&Q2)) {
-            pthread_cond_broadcast(&serverQ);
-        }
-
-        pthread_mutex_unlock(&Q1Mutex);
         
     }
 
@@ -394,8 +399,6 @@ void *tokenArrivalMethod(void *args)
     while (packetsServed < num || !serveInterrupt) {
         
         long int sleeptime = ((1/r)*1000000 - elapsedTime);
-
-      //  printf("\n------%d token------\n",(unsigned int)sleeptime);
         
         usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
 
@@ -405,6 +408,7 @@ void *tokenArrivalMethod(void *args)
         pthread_mutex_lock(&Q1Mutex); 
         {
 
+            pthread_cleanup_push(handleCleanUp, 0);
             if (tokenBucket.num_members <= b) {
                 int *token = (int*)malloc(sizeof(int));
                 pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
@@ -456,12 +460,15 @@ void *tokenArrivalMethod(void *args)
                     pthread_cond_broadcast(&serverQ);
                 }
             }
-            pthread_mutex_unlock(&Q1Mutex); 
+            pthread_cleanup_pop(0);
+            pthread_mutex_unlock(&Q1Mutex);
             
             if (packetsServed == num) {
-	        pthread_mutex_lock(&Q1Mutex); 
+                pthread_mutex_lock(&Q1Mutex);
+                pthread_cleanup_push(handleCleanUp, 0);
                 pthread_cond_broadcast(&serverQ);
-                pthread_mutex_unlock(&Q1Mutex); 
+                pthread_cleanup_pop(0);
+                pthread_mutex_unlock(&Q1Mutex);
                 break;
             }
 
@@ -472,7 +479,6 @@ void *tokenArrivalMethod(void *args)
 
     }
 
-    //printf("\n token thread exit \n");
     pthread_exit(0);
 }
 
@@ -512,10 +518,6 @@ void *serverMethod(void *args)
         
         gettimeofday(&dequePacket->serviceStartTime,NULL);
         
-     //   printf("start time tv_sec %ld  tv_usec %ld",dequePacket->serviceStartTime.tv_sec,dequePacket->serviceStartTime.tv_sec);
-
-     //   printf("my service start time is %ld , elapsed time is %lld , currenttime %lld\n",(dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec),elapsedTime,currentTime);
-
         mainTimeLine = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec + timeOffset)/1000;
 
         printf("%012.3lfms : p%d begins service at S1, requesting %fms of service\n",mainTimeLine,dequePacket->ID,dequePacket->serviceTime/1000);
@@ -523,7 +525,6 @@ void *serverMethod(void *args)
 
         long int sleeptime = (dequePacket->serviceTime) - elapsedTime;
 
-    //    printf("\n------%d server 1 ------\n",(unsigned int)sleeptime);
 
         usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
 
@@ -531,7 +532,6 @@ void *serverMethod(void *args)
         
         mainTimeLine = (dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec + timeOffset)/1000;
 
-        //printf("packets : %d , num : %ld",packetsServed,num);
 
         printf("%012.3lfms : p%d departs from S1, service time = %08.3lfms , time in system = %08.3lfms\n",mainTimeLine,dequePacket->ID,((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec)))/1000,((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->Q1EnterTime.tv_sec*1000000 + dequePacket->Q1EnterTime.tv_usec)))/1000);
         
@@ -556,15 +556,13 @@ void *server2Method(void *args)
     while (1) {
         
         pthread_mutex_lock(&Q1Mutex); 
-        pthread_cleanup_push(handleCleanUp, 0);
 
         
         while (My402ListEmpty(&Q2) && packetsServed != num && !serveInterrupt) {
             pthread_cond_wait(&serverQ, &Q1Mutex);
         }
-        
+
         if (packetsServed == num || serveInterrupt) {
-            pthread_cleanup_pop(0);
             pthread_mutex_unlock(&Q1Mutex);
             break;
         }
@@ -584,12 +582,10 @@ void *server2Method(void *args)
         
         packetsServed++;
         
-        pthread_cleanup_pop(0);
         pthread_mutex_unlock(&Q1Mutex);
         
         gettimeofday(&dequePacket->serviceStartTime,NULL);
         
-     //   printf("my service start time is %ld , elapsed time is %lld , currenttime %lld\n",(dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec),elapsedTime,currentTime);
 
         mainTimeLine = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec + timeOffset)/1000;
 
@@ -598,15 +594,12 @@ void *server2Method(void *args)
 
         long int sleeptime = (dequePacket->serviceTime) - elapsedTime;
         
-     //  printf("\n------%d server 2 ------\n",(unsigned int)sleeptime);
 
         usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
 
         
         gettimeofday(&dequePacket->serviceEndTime,NULL);
         
-	//printf("packets : %d , num : %ld",packetsServed,num);
-
             mainTimeLine = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec + timeOffset)/1000;
 
            printf("%012.3lfms : p%d departs from S2, service time = %08.3lfms , time in system = %08.3lfms\n",mainTimeLine,dequePacket->ID,((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec)))/1000,((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->Q1EnterTime.tv_sec*1000000 + dequePacket->Q1EnterTime.tv_usec)))/1000);
@@ -622,7 +615,6 @@ void *server2Method(void *args)
         }
         
     }
-	//printf("\n server 2 thread exit \n");
     pthread_exit(0);
 }
 
@@ -634,7 +626,6 @@ void *handleQuitGracefully(void *args)
         sigaction(SIGINT, &action, NULL);
         usleep(2000000);
     }
- //   printf("\n control c thread exit \n");
     pthread_exit(0);
 }
 
@@ -645,6 +636,7 @@ void handleCleanUp()
 
 void handleQuit(int signal)
 {
+    printf("calling handler");
     pthread_cancel(tokenThread);
     pthread_cancel(packetThread);
     
