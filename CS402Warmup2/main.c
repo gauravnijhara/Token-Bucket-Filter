@@ -308,7 +308,8 @@ void *packetArrivalMethod(void *args)
         
         if (newPacket->tokensNeeded > b) {
             packetsServed++;
-            printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms , dropped \n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/1000);
+            printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms \n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/1000);
+            continue;
 
         }else {
             printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms \n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/1000);
