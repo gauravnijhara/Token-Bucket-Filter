@@ -458,7 +458,7 @@ void *tokenArrivalMethod(void *args)
                 struct timeval temp;
                 gettimeofday(&temp, NULL);
                 mainTimeLine = (temp.tv_sec*1000000 + temp.tv_usec + timeOffset)/1000;
-                printf("%012.3lfms : Token t%d arrives, dropped \n ",mainTimeLine,totalTokenGenerated);
+                printf("%012.3lfms : Token t%d arrives, dropped \n",mainTimeLine,totalTokenGenerated);
 
             }
             
@@ -718,53 +718,53 @@ void handleQuit(int signal)
 
 void printStats()
 {
-    printf("\n\n Statistics: \n\n");
+    printf("\n\nStatistics: \n\n");
     
     if (!packetCount) {
-        printf("\naverage packet inter arrival time = No packets in system");
+        printf("\n\t\taverage packet inter arrival time = No packets in system");
     }else {
-        printf("\naverage packet inter arrival time = %.6g ms\n",(totalInterArrivalTime/packetCount));
+        printf("\n\t\taverage packet inter arrival time = %.6g ms\n",(totalInterArrivalTime/packetCount));
     }
     
     if (!(packetCount-droppedPackets)) {
-        printf("average packet service time = All packets dropped or no packets in system");
+        printf("\t\taverage packet service time = All packets dropped or no packets in system");
     }else {
-        printf("average packet service time = %.6g ms\n",((totalTimeInS1+totalTimeInS2)/(packetCount-droppedPackets)));
+        printf("\t\taverage packet service time = %.6g ms\n",((totalTimeInS1+totalTimeInS2)/(packetCount-droppedPackets)));
     }
 
-    printf("\naverage number of packets in Q1 = %.6g packets\n",(totalTimeInQ1/mainTimeLine));
-    printf("average number of packets in Q2 = %.6g packets\n",(totalTimeInQ2/mainTimeLine));
-    printf("average number of packets in S1 = %.6g packets\n",(totalTimeInS1/mainTimeLine));
-    printf("average number of packets in S2 = %.6g packets\n",(totalTimeInS2/mainTimeLine));
+    printf("\n\t\taverage number of packets in Q1 = %.6g packets\n",(totalTimeInQ1/mainTimeLine));
+    printf("\t\taverage number of packets in Q2 = %.6g packets\n",(totalTimeInQ2/mainTimeLine));
+    printf("\t\taverage number of packets in S1 = %.6g packets\n",(totalTimeInS1/mainTimeLine));
+    printf("\t\taverage number of packets in S2 = %.6g packets\n",(totalTimeInS2/mainTimeLine));
     
     if (!(packetCount-droppedPackets)) {
-        printf("\naverage time a packet spent in system = All packets dropped or no packets in system");
+        printf("\n\t\taverage time a packet spent in system = All packets dropped or no packets in system");
     }else {
-        printf("\naverage time a packet spent in system = %.6g ms\n",(totalTimeSpentInSystem/(packetCount-droppedPackets)));
+        printf("\n\t\taverage time a packet spent in system = %.6g ms\n",(totalTimeSpentInSystem/(packetCount-droppedPackets)));
     }
     
     
     if (!(packetCount-droppedPackets)) {
-        printf("standard deviation for time spent in system = All packets dropped or no packets in system");
+        printf("\t\tstandard deviation for time spent in system = All packets dropped or no packets in system");
 
     }
     else {
-        printf("standard deviation for time spent in system = %.6g\n",sqrt((squareOfSystemTime/(packetCount-droppedTokens))- (((totalTimeSpentInSystem/(packetCount-droppedPackets))*(totalTimeSpentInSystem/(packetCount-droppedPackets))))));
+        printf("\t\tstandard deviation for time spent in system = %.6g\n",sqrt((squareOfSystemTime/(packetCount-droppedTokens))- (((totalTimeSpentInSystem/(packetCount-droppedPackets))*(totalTimeSpentInSystem/(packetCount-droppedPackets))))));
     }
     
     
     if (!totalTokenGenerated) {
-        printf("\ntoken drop probability = No tokens generated");
+        printf("\n\t\ttoken drop probability = No tokens generated");
     }else {
         float num = ((float)droppedTokens)/((float)totalTokenGenerated);
-        printf("\ntoken drop probability = %f\n",num);
+        printf("\n\t\ttoken drop probability = %f\n",num);
     }
     
     if (!packetCount) {
-        printf("packet drop probability = No packets in system ");
+        printf("\t\tpacket drop probability = No packets in system ");
     }else {
         float num = ((float)droppedPackets)/((float)packetCount);
-        printf("packet drop probability = %f\n",num);
+        printf("\t\tpacket drop probability = %f\n",num);
     }
     
     
