@@ -506,11 +506,11 @@ void *serverMethod(void *args)
         
         gettimeofday(&dequePacket->serviceStartTime,NULL);
         
-        printf("start time tv_sec %ld  tv_usec %ld",dequePacket->serviceStartTime.tv_sec,dequePacket->serviceStartTime.tv_sec);
+     //   printf("start time tv_sec %ld  tv_usec %ld",dequePacket->serviceStartTime.tv_sec,dequePacket->serviceStartTime.tv_sec);
         
         elapsedTime = dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec - currentTime;
 
-        printf("my service start time is %ld , elapsed time is %lld , currenttime %lld\n",(dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec),elapsedTime,currentTime);
+     //   printf("my service start time is %ld , elapsed time is %lld , currenttime %lld\n",(dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec),elapsedTime,currentTime);
 
         mainTimeLine = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec + timeOffset)/1000;
 
@@ -581,12 +581,9 @@ void *server2Method(void *args)
         pthread_mutex_unlock(&Q1Mutex); 
         
         gettimeofday(&dequePacket->serviceStartTime,NULL);
-        
-        printf("start time tv_sec %ld  tv_usec %ld",dequePacket->serviceStartTime.tv_sec,dequePacket->serviceStartTime.tv_sec);
-
         elapsedTime = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec) - currentTime;
         
-        printf("my service start time is %ld , elapsed time is %lld , currenttime %lld\n",(dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec),elapsedTime,currentTime);
+     //   printf("my service start time is %ld , elapsed time is %lld , currenttime %lld\n",(dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec),elapsedTime,currentTime);
 
         mainTimeLine = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec + timeOffset)/1000;
 
