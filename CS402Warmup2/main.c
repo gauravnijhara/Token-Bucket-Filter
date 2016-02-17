@@ -525,7 +525,6 @@ void *serverMethod(void *args)
         usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
 
         gettimeofday(&dequePacket->serviceEndTime,NULL);
-        currentTime = dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec;
         
         mainTimeLine = (dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec + timeOffset)/1000;
 
@@ -598,7 +597,6 @@ void *server2Method(void *args)
 
         
         gettimeofday(&dequePacket->serviceEndTime,NULL);
-        currentTime = dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec;
         
 	//printf("packets : %d , num : %ld",packetsServed,num);
 
