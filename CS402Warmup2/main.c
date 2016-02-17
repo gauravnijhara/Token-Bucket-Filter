@@ -651,8 +651,8 @@ void handleQuit(int signal)
     
     printf("errors here");
     // traverse Q1 and Q2 to prompt delete
-    My402ListUnlinkAll(&Q1);
-    My402ListUnlinkAll(&Q2);
+  //  My402ListUnlinkAll(&Q1);
+  //  My402ListUnlinkAll(&Q2);
     
     pthread_mutex_unlock(&Q1Mutex); 
     pthread_exit(0);
