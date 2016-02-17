@@ -408,6 +408,9 @@ void *tokenArrivalMethod(void *args)
             pthread_mutex_unlock(&Q1Mutex); 
             
             if (packetsServed == num) {
+	        pthread_mutex_lock(&Q1Mutex); 
+                pthread_cond_broadcast(&serverQ);
+                pthread_mutex_unlock(&Q1Mutex); 
                 break;
             }
 
