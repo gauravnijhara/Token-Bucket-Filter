@@ -30,6 +30,7 @@ unsigned int packetCount = 0;
 unsigned int packetsServed = 0;
 unsigned int serveInterrupt = 0;
 unsigned int isTraceFileMode = 0;
+unsigned int allThreadsKilled = 0;
 
 double lambda = 1,mu = 0.35,r = 1.5, b = 10 ,p = 3;
 long int num = 20;
@@ -206,14 +207,15 @@ int main(int argc, const char * argv[]) {
     pthread_create(&tokenThread, NULL,tokenArrivalMethod, NULL);
     pthread_create(&serverThread1, NULL,serverMethod, NULL);
     pthread_create(&serverThread2, NULL,server2Method, NULL);
-    //pthread_create(&signalQuitThread, NULL,handleQuitGracefully, NULL);
+    pthread_create(&signalQuitThread, NULL,handleQuitGracefully, NULL);
 
     
     pthread_join(packetThread, NULL);
     pthread_join(tokenThread, NULL);
     pthread_join(serverThread1, NULL);
     pthread_join(serverThread2, NULL);
-    //pthread_join(signalQuitThread,NULL);
+    allThreadsKilled = 1;
+    pthread_join(signalQuitThread,NULL);
     
     printf("\n Emulation ends");
     pthread_exit(0);
@@ -546,12 +548,13 @@ void *server2Method(void *args)
 
 void *handleQuitGracefully(void *args)
 {
-    while (1) {
+    while (!allThreadsKilled) {
         pthread_sigmask(SIG_UNBLOCK, &quitSignal, NULL);
         action.sa_handler = handleQuit;
         sigaction(SIGINT, &action, NULL);
         usleep(100000000);
     }
+    pthread_exit(0);
 }
 
 void handleQuit(int signal)
