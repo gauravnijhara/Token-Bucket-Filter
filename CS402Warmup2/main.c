@@ -201,13 +201,6 @@ int main(int argc, const char * argv[]) {
         }
     }
     
-//    number to arrive = 20
-//    lambda = 2            (print this line only if -t is not specified)
-//    mu = 0.35             (print this line only if -t is not specified)
-//    r = 4
-//    B = 10
-//    P = 3                 (print this line only if -t is not specified)
-//    tsfile = FILENAME
     printf("number to arrive = %ld\n",num);
     if (!isTraceFileMode) {
         printf("\t\tlambda = %f\n",lambda);
@@ -221,8 +214,11 @@ int main(int argc, const char * argv[]) {
         printf("\t\ttsfile = %s\n",fileName);
     }
 
-    mainTimeLine = 0.0;
-    printf("%8.3lfms : Emulation Begins\n\n",mainTimeLine);
+    struct timeval temp;
+    gettimeofday(&temp, NULL);
+    mainTimeLine = (-1)*(temp.tv_sec*1000 + temp.tv_usec/1000);
+    
+    printf("%8.3lfms : Emulation Begins\n\n",000000000.000);
     sigemptyset(&quitSignal);
     sigaddset(&quitSignal, SIGINT);
     pthread_sigmask(SIG_BLOCK, &quitSignal, NULL);
@@ -299,7 +295,7 @@ void *packetArrivalMethod(void *args)
         
         gettimeofday(&time,NULL);
         currentTime = time.tv_sec + time.tv_usec*1000000L;
-        mainTimeLine += time.tv_sec*1000 + time.tv_usec/1000;
+        mainTimeLine +=  time.tv_sec*1000 + time.tv_usec/1000;
         
         
         // packetCount
