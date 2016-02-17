@@ -515,7 +515,7 @@ void *serverMethod(void *args)
 
         long int sleeptime = (dequePacket->serviceTime) - elapsedTime;
 
-      //  printf("\n------%d server 1 ------\n",(unsigned int)sleeptime);
+        printf("\n------%d server 1 ------\n",(unsigned int)sleeptime);
 
         usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
 
@@ -585,7 +585,7 @@ void *server2Method(void *args)
         
         long int sleeptime = (dequePacket->serviceTime) - elapsedTime;
         
-       // printf("\n------%d server 2 ------\n",(unsigned int)sleeptime);
+        printf("\n------%d server 2 ------\n",(unsigned int)sleeptime);
 
         usleep(((sleeptime<0)?0:(unsigned int)sleeptime));
 
