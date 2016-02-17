@@ -86,6 +86,9 @@ int main(int argc, const char * argv[]) {
                     fprintf(stderr,"Malformed Command , lambda value must be greater than 0");
                     exit(0);
                 }
+                if ((1/lambda) > 10.0) {
+                    lambda = 0.1;
+                }
                 i+=1;
             }else {
                 fprintf(stderr,"Malformed Command , lambda value not provided");
@@ -97,6 +100,9 @@ int main(int argc, const char * argv[]) {
                 if (mu < 0) {
                     fprintf(stderr,"Malformed Command , Mu value must be greater than 0");
                     exit(0);
+                }
+                if ((1/mu) > 10.0) {
+                    mu = 0.1;
                 }
                 i+=1;
             }else {
@@ -429,12 +435,13 @@ void *tokenArrivalMethod(void *args)
         pthread_mutex_lock(&Q1Mutex); 
         {
 
+            totalTokenGenerated++;
+
             pthread_cleanup_push(handleCleanUp, 0);
             if (tokenBucket.num_members <= b) {
                 int *token = (int*)malloc(sizeof(int));
                 pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0);
                 My402ListAppend(&tokenBucket,token);
-                totalTokenGenerated++;
                 pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0);
             }else {
                 droppedTokens++;
@@ -546,7 +553,7 @@ void *serverMethod(void *args)
         
         mainTimeLine = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec + timeOffset)/1000;
 
-        printf("%012.3lfms : p%d begins service at S1, requesting %fms of service\n",mainTimeLine,dequePacket->ID,dequePacket->serviceTime/1000);
+        printf("%012.3lfms : p%d begins service at S1, requesting %.03fms of service\n",mainTimeLine,dequePacket->ID,dequePacket->serviceTime/1000);
      
 
         long int sleeptime = (dequePacket->serviceTime) - elapsedTime;
@@ -623,7 +630,7 @@ void *server2Method(void *args)
 
         mainTimeLine = (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec + timeOffset)/1000;
 
-        printf("%012.3lfms : p%d begins service at S2, requesting %fms of service\n",mainTimeLine,dequePacket->ID,dequePacket->serviceTime/1000);
+        printf("%012.3lfms : p%d begins service at S2, requesting %.03fms of service\n",mainTimeLine,dequePacket->ID,dequePacket->serviceTime/1000);
         
 
         long int sleeptime = (dequePacket->serviceTime) - elapsedTime;
@@ -699,24 +706,25 @@ void printStats()
     if (!packetCount) {
         printf("\naverage packet inter arrival time = No packets in system");
     }else {
-        printf("\naverage packet inter arrival time = %.6g\n",(totalInterArrivalTime/packetCount));
+        printf("\naverage packet inter arrival time = %.6g ms\n",(totalInterArrivalTime/packetCount));
     }
     
     if (!(packetCount-droppedPackets)) {
         printf("average packet service time = All packets dropped or no packets in system");
     }else {
-        printf("average packet service time = %.6g\n",((totalTimeInS1+totalTimeInS2)/(packetCount-droppedPackets)));
+        printf("average packet service time = %.6g ms\n",((totalTimeInS1+totalTimeInS2)/(packetCount-droppedPackets)));
     }
 
-    printf("\naverage number of packets in Q1 = %.6g\n",(totalTimeInQ1/mainTimeLine));
-    printf("average number of packets in Q2 = %.6g\n",(totalTimeInQ2/mainTimeLine));
-    printf("average number of packets in S1 = %.6g\n",(totalTimeInS1/mainTimeLine));
-    printf("average number of packets in S2 = %.6g\n",(totalTimeInS2/mainTimeLine));
+    printf("total time in Q1 is %d",totalTimeInQ1);
+    printf("\naverage number of packets in Q1 = %.6g packets\n",(totalTimeInQ1/mainTimeLine));
+    printf("average number of packets in Q2 = %.6g packets\n",(totalTimeInQ2/mainTimeLine));
+    printf("average number of packets in S1 = %.6g packets\n",(totalTimeInS1/mainTimeLine));
+    printf("average number of packets in S2 = %.6g packets\n",(totalTimeInS2/mainTimeLine));
     
     if (!(packetCount-droppedPackets)) {
         printf("\naverage time a packet spent in system = All packets dropped or no packets in system");
     }else {
-        printf("\naverage time a packet spent in system = %.6g\n",(totalTimeSpentInSystem/(packetCount-droppedPackets)));
+        printf("\naverage time a packet spent in system = %.6g ms\n",(totalTimeSpentInSystem/(packetCount-droppedPackets)));
     }
     
     
