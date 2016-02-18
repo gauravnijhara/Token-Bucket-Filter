@@ -82,7 +82,7 @@ int main(int argc, const char * argv[]) {
             
             if ((i+1 != argc) && (1 == sscanf(argv[i+1],"%lf",&lambda))) {
                 if (lambda < 0) {
-                    fprintf(stderr,"Malformed Command , lambda value must be greater than 0");
+                    fprintf(stderr,"Malformed Command , lambda value must be greater than 0 \n");
                     exit(0);
                 }
                 if ((1/lambda) > 10.0) {
@@ -90,14 +90,14 @@ int main(int argc, const char * argv[]) {
                 }
                 i+=1;
             }else {
-                fprintf(stderr,"Malformed Command , lambda value not provided");
+                fprintf(stderr,"Malformed Command , lambda value not provided \n");
                 exit(0);
             }
         }else if (strcmp(argv[i],"-mu") == 0) {
             
             if ((i+1 != argc) && (1 == sscanf(argv[i+1],"%lf",&mu))) {
                 if (mu < 0) {
-                    fprintf(stderr,"Malformed Command , Mu value must be greater than 0");
+                    fprintf(stderr,"Malformed Command , Mu value must be greater than 0 \n");
                     exit(0);
                 }
                 if ((1/mu) > 10.0) {
@@ -105,55 +105,55 @@ int main(int argc, const char * argv[]) {
                 }
                 i+=1;
             }else {
-                fprintf(stderr,"Malformed Command , Mu value not provided");
+                fprintf(stderr,"Malformed Command , Mu value not provided \n");
                 exit(0);
             }
         }else if (strcmp(argv[i],"-r") == 0) {
             
             if ((i+1 != argc) && (1 == sscanf(argv[i+1],"%lf",&r))) {
                 if (r < 0) {
-                    fprintf(stderr,"Malformed Command , Rate of tokens must be greater than 0");
+                    fprintf(stderr,"Malformed Command , Rate of tokens must be greater than 0 \n");
                     exit(0);
                 }
                 i+=1;
             }else {
-                fprintf(stderr,"Malformed Command , Rate of tokens value not provided");
+                fprintf(stderr,"Malformed Command , Rate of tokens value not provided \n");
                 exit(0);
             }
         }else if (strcmp(argv[i],"-B") == 0) {
             
             if ((i+1 != argc) && (1 == sscanf(argv[i+1],"%lf",&b))) {
                 if (b < 0) {
-                    fprintf(stderr,"Malformed Command , Bucket size must be greater than 0");
+                    fprintf(stderr,"Malformed Command , Bucket size must be greater than 0 \n");
                     exit(0);
                 }
                 i+=1;
             }else {
-                fprintf(stderr,"Malformed Command , Bucket size value not provided");
+                fprintf(stderr,"Malformed Command , Bucket size value not provided \n");
                 exit(0);
             }
         }else if (strcmp(argv[i],"-P") == 0) {
             
             if ((i+1 != argc) && (1 == sscanf(argv[i+1],"%lf",&p))) {
                 if (p < 0) {
-                    fprintf(stderr,"Malformed Command , token per packet must be greater than 0");
+                    fprintf(stderr,"Malformed Command , token per packet must be greater than 0 \n");
                     exit(0);
                 }
                 i+=1;
             }else {
-                fprintf(stderr,"Malformed Command , tokens per packet value not provided");
+                fprintf(stderr,"Malformed Command , tokens per packet value not provided \n");
                 exit(0);
             }
         }else if (strcmp(argv[i],"-n") == 0) {
             
             if ((i+1 != argc) && (1 == sscanf(argv[i+1],"%ld",&num))) {
                 if (num < 0) {
-                    fprintf(stderr,"Malformed Command , Packet count must be greater than 0");
+                    fprintf(stderr,"Malformed Command , Packet count must be greater than 0 \n");
                     exit(0);
                 }
                 i+=1;
             }else {
-                fprintf(stderr,"Malformed Command , Packet count value not provided");
+                fprintf(stderr,"Malformed Command , Packet count value not provided \n");
                 exit(0);
             }
         }else if (strcmp(argv[i],"-t") == 0) {
@@ -217,12 +217,12 @@ int main(int argc, const char * argv[]) {
                 
                 i+=1;
             }else {
-                fprintf(stderr,"Malformed Command , Filename not in proper format ");
+                fprintf(stderr,"Malformed Command , Filename not in proper format \n");
                 exit(0);
             }
         }
         else {
-            fprintf(stderr,"Malformed Command , Filename not in proper format ");
+            fprintf(stderr,"Malformed Command , Filename not in proper format \n");
             exit(0);
         }
     }
