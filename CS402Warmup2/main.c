@@ -299,6 +299,8 @@ void *packetArrivalMethod(void *args)
                 double interArrivalTime = atof(token)*1000;
                 newPacket->interArrivalTime = interArrivalTime;
                 
+                printf("inter arrival time %f\n",interArrivalTime);
+                
                 // tokens needed
                 token = strtok(NULL, s);
                 int tokensNeeded = atoi(token);
@@ -339,11 +341,11 @@ void *packetArrivalMethod(void *args)
         if (newPacket->tokensNeeded > b) {
             droppedPackets++;
             packetsServed++;
-            printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms, dropped\n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/10000);
+            printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms, dropped\n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/1000);
             continue;
 
         }else {
-            printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms \n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/10000);
+            printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms \n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/1000);
         }
 
         prevTokenArrivalTime = currentTime;
