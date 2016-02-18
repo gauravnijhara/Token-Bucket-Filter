@@ -329,20 +329,21 @@ void *packetArrivalMethod(void *args)
         usleep((sleeptime<0)?0:(unsigned int)sleeptime);
         
         gettimeofday(&time,NULL);
-        currentTime = time.tv_sec*1000000 + time.tv_usec;
         mainTimeLine =  (time.tv_sec*1000000 + time.tv_usec + timeOffset)/1000;
+        currentTime = time.tv_sec*1000000 + time.tv_usec;
         
         
         // packetCount
         totalInterArrivalTime += ((double)(currentTime-prevTokenArrivalTime))/1000;
+        
         if (newPacket->tokensNeeded > b) {
             droppedPackets++;
             packetsServed++;
-            printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms, dropped\n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/1000);
+            printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms, dropped\n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/10000);
             continue;
 
         }else {
-            printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms \n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/1000);
+            printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms \n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/10000);
         }
 
         prevTokenArrivalTime = currentTime;
