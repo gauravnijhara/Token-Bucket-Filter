@@ -274,7 +274,7 @@ int main(int argc, const char * argv[]) {
 
 void *packetArrivalMethod(void *args)
 {
-    long long prevTokenArrivalTime=0,currentTime,elapsedTime = 0;
+    long long prevTokenArrivalTime=0,currentTime;
     struct timeval time;
     
     gettimeofday(&time,NULL);
@@ -320,10 +320,7 @@ void *packetArrivalMethod(void *args)
         }
         newPacket->ID = ++packetCount;
 
-        gettimeofday(&time,NULL);
-        elapsedTime = time.tv_sec*1000000 + time.tv_usec - currentTime;
-
-        long int sleeptime = ((newPacket->interArrivalTime) - elapsedTime);
+        long int sleeptime = ((newPacket->interArrivalTime));
         
       //  printf("\n sleeptime %ld \n",sleeptime);
         
