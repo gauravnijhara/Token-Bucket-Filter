@@ -335,16 +335,17 @@ void *packetArrivalMethod(void *args)
       //  printf("\n\n %f total time tokens adding %f , previous time %lld \n\n",totalInterArrivalTime,((double)(currentTime-prevTokenArrivalTime))/1000,prevTokenArrivalTime);
         totalInterArrivalTime += ((double)(currentTime-prevTokenArrivalTime))/1000;
         
-        prevTokenArrivalTime = currentTime;
 
         if (newPacket->tokensNeeded > b) {
             droppedPackets++;
             packetsServed++;
             printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms, dropped\n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/1000);
+            prevTokenArrivalTime = currentTime;
             continue;
 
         }else {
             printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms \n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/1000);
+            prevTokenArrivalTime = currentTime;
         }
 
         newPacket->systemTimeOnEnter = time;
