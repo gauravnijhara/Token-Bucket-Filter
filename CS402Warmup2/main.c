@@ -752,10 +752,10 @@ void printStats()
     }
     else {
         
-//        double avgOfSquared = (squareOfSystemTime/(packetsServed-droppedPackets));
-//        double squaredAvg = (((totalTimeSpentInSystem/(packetsServed-droppedPackets))*(totalTimeSpentInSystem/(packetsServed-droppedPackets))));
-//        
-//        printf("\n\n avg squared = %lf , squared avg = %lf , packet served = %u , dropped tokens = %d \n\n",avgOfSquared,squaredAvg,packetsServed,droppedPackets);
+        double avgOfSquared = (squareOfSystemTime/(packetsServed-droppedPackets));
+        double squaredAvg = (((totalTimeSpentInSystem/(packetsServed-droppedPackets))*(totalTimeSpentInSystem/(packetsServed-droppedPackets))));
+        
+        printf("\n\n avg squared = %lf , squared avg = %lf , packet served = %u , dropped tokens = %d \n\n",avgOfSquared,squaredAvg,packetsServed,droppedPackets);
 
         printf("\t\tstandard deviation for time spent in system = %.6g\n",sqrt((squareOfSystemTime/(packetsServed-droppedPackets))- (((totalTimeSpentInSystem/(packetsServed-droppedPackets))*(totalTimeSpentInSystem/(packetsServed-droppedPackets)))))/1000);
     }
