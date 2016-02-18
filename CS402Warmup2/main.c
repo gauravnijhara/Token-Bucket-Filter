@@ -589,7 +589,7 @@ void *serverMethod(void *args)
         
         totalTimeSpentInSystem += ((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->Q1EnterTime.tv_sec*1000000 + dequePacket->Q1EnterTime.tv_usec)))/1000;
         
-        squareOfSystemTime += totalTimeSpentInSystem*totalTimeSpentInSystem;
+        squareOfSystemTime += (totalTimeSpentInSystem*totalTimeSpentInSystem);
         
         if (packetsServed == num || serveInterrupt) {
             if (packetsServed == num) {
@@ -749,7 +749,7 @@ void printStats()
 
     }
     else {
-        printf("\t\tstandard deviation for time spent in system = %.6g\n",sqrt((squareOfSystemTime/(packetsServed-droppedTokens))- (((totalTimeSpentInSystem/(packetsServed-droppedPackets))*(totalTimeSpentInSystem/(packetsServed-droppedPackets)))))/1000);
+        printf("\t\tstandard deviation for time spent in system = %.6g\n",sqrt((squareOfSystemTime/(packetsServed-droppedPackets))- (((totalTimeSpentInSystem/(packetsServed-droppedPackets))*(totalTimeSpentInSystem/(packetsServed-droppedPackets)))))/1000);
     }
     
     
