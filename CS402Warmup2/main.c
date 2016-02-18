@@ -331,8 +331,8 @@ void *packetArrivalMethod(void *args)
         mainTimeLine =  (time.tv_sec*1000000 + time.tv_usec + timeOffset)/1000;
         currentTime = time.tv_sec*1000000 + time.tv_usec;
         
-        
         // packetCount
+        printf("%f total time tokens adding %f",totalInterArrivalTime,((double)(currentTime-prevTokenArrivalTime))/1000);
         totalInterArrivalTime += ((double)(currentTime-prevTokenArrivalTime))/1000;
         
         if (newPacket->tokensNeeded > b) {
