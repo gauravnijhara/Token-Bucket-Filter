@@ -667,6 +667,11 @@ void *server2Method(void *args)
         totalTimeInS2 += ((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->serviceStartTime.tv_sec*1000000 + dequePacket->serviceStartTime.tv_usec)))/1000;
 
         totalTimeSpentInSystem += ((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->Q1EnterTime.tv_sec*1000000 + dequePacket->Q1EnterTime.tv_usec)))/1000;
+        
+        double timeVal = ((double)((dequePacket->serviceEndTime.tv_sec*1000000 + dequePacket->serviceEndTime.tv_usec) - (dequePacket->Q1EnterTime.tv_sec*1000000 + dequePacket->Q1EnterTime.tv_usec)))/1000;
+        
+        squareOfSystemTime += (timeVal*timeVal);
+
 
         if (packetsServed == num || serveInterrupt) {
             if (packetsServed == num) {
