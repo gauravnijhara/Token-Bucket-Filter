@@ -74,7 +74,6 @@ void printStats();
 
 int main(int argc, const char * argv[]) {
     
-    printf("\n\nEmulation Parameters:\n");
     
     int i;
     for (i = 1; i < argc; i++) {
@@ -228,6 +227,8 @@ int main(int argc, const char * argv[]) {
         }
     }
     
+    printf("\n\nEmulation Parameters:\n");
+
     printf("\t\tnumber to arrive = %ld\n",num);
     if (!isTraceFileMode) {
         printf("\t\tlambda = %f\n",lambda);
