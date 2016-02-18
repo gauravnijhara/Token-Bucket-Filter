@@ -222,7 +222,7 @@ int main(int argc, const char * argv[]) {
             }
         }
         else {
-            fprintf(stderr,"Malformed Command , Filename not in proper format \n");
+            fprintf(stderr,"Malformed Command , use warmup2 [-lambda lambda] [-mu mu] [-r r] [-B B] [-P P] [-n num] [-t tsfile] \n");
             exit(0);
         }
     }
