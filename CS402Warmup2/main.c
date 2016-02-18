@@ -299,7 +299,7 @@ void *packetArrivalMethod(void *args)
                 double interArrivalTime = atof(token)*1000;
                 newPacket->interArrivalTime = interArrivalTime;
                 
-                printf("inter arrival time %f\n",interArrivalTime);
+            //    printf("inter arrival time %f\n",interArrivalTime);
                 
                 // tokens needed
                 token = strtok(NULL, s);
@@ -332,9 +332,11 @@ void *packetArrivalMethod(void *args)
         currentTime = time.tv_sec*1000000 + time.tv_usec;
         
         // packetCount
-        printf("\n\n %f total time tokens adding %f , previous time %lld \n\n",totalInterArrivalTime,((double)(currentTime-prevTokenArrivalTime))/1000,prevTokenArrivalTime);
+      //  printf("\n\n %f total time tokens adding %f , previous time %lld \n\n",totalInterArrivalTime,((double)(currentTime-prevTokenArrivalTime))/1000,prevTokenArrivalTime);
         totalInterArrivalTime += ((double)(currentTime-prevTokenArrivalTime))/1000;
         
+        prevTokenArrivalTime = currentTime;
+
         if (newPacket->tokensNeeded > b) {
             droppedPackets++;
             packetsServed++;
@@ -344,8 +346,6 @@ void *packetArrivalMethod(void *args)
         }else {
             printf("%012.3lfms : packet%d arrives , need %d tokens, inter-arrival time = %08.3lfms \n",mainTimeLine,newPacket->ID,newPacket->tokensNeeded,((double)(currentTime-prevTokenArrivalTime))/1000);
         }
-
-        prevTokenArrivalTime = currentTime;
 
         newPacket->systemTimeOnEnter = time;
         
